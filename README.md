@@ -2,17 +2,6 @@
 
 Minecraft Forge 1.12.2 定向越野比赛 Mod。提供检查点、起点/终点、路线、比赛管理、成统、轨迹和制图功能。
 
-## 当前版本
-
-4.3 主要变化：
-
-- `matchseed.json` 新增 `customfalldamage` 开关，可关闭 ORT 在比赛中替换摔落伤害的特殊逻辑。
-- `/ORT` 增加 Tab 补全：子命令、比赛名和路线名。
-- 专用服务器支持 `/ORT generate [比赛名]`，生成后直接加载。
-- 修复轨迹导出不稳定问题。
-- 成统明细文件为 `1_statdetail.txt`，旧的 `1_err.txt` 说明已废弃。
-- 新增准星指向起点/终点/检查点时的中文名称提示。
-
 完整使用说明见 [docs/OrienteeringMod-4.3-说明书.md](docs/OrienteeringMod-4.3-说明书.md)。
 
 ## 仓库结构
