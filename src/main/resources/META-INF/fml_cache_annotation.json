@@ -1,0 +1,326 @@
+{
+  "net/respawner/orienteeringmod/BlockCheckpoint": {
+    "name": "net/respawner/orienteeringmod/BlockCheckpoint",
+    "interfaces": [
+      "net/minecraft/block/ITileEntityProvider"
+    ]
+  },
+  "net/respawner/orienteeringmod/Cartography$Draw": {
+    "name": "net/respawner/orienteeringmod/Cartography$Draw",
+    "interfaces": [
+      "java/lang/Runnable"
+    ]
+  },
+  "net/respawner/orienteeringmod/CourseBasic": {
+    "name": "net/respawner/orienteeringmod/CourseBasic",
+    "interfaces": [
+      "net/respawner/orienteeringmod/ICourse"
+    ]
+  },
+  "net/respawner/orienteeringmod/GradeMP": {
+    "name": "net/respawner/orienteeringmod/GradeMP",
+    "interfaces": [
+      "net/respawner/orienteeringmod/IGrade"
+    ]
+  },
+  "net/respawner/orienteeringmod/GradeSP": {
+    "name": "net/respawner/orienteeringmod/GradeSP",
+    "interfaces": [
+      "net/respawner/orienteeringmod/IGrade"
+    ]
+  },
+  "net/respawner/orienteeringmod/ICourse": {
+    "name": "net/respawner/orienteeringmod/ICourse",
+    "interfaces": [
+      "java/io/Serializable"
+    ]
+  },
+  "net/respawner/orienteeringmod/IGrade": {
+    "name": "net/respawner/orienteeringmod/IGrade",
+    "interfaces": [
+      "java/io/Serializable"
+    ]
+  },
+  "net/respawner/orienteeringmod/IPlayerGroup": {
+    "name": "net/respawner/orienteeringmod/IPlayerGroup",
+    "interfaces": [
+      "java/io/Serializable"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgGradeRequest": {
+    "name": "net/respawner/orienteeringmod/MsgGradeRequest",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessage"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgGradeRequest$MsgGRHandler": {
+    "name": "net/respawner/orienteeringmod/MsgGradeRequest$MsgGRHandler",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessageHandler"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgGradeRequest$MsgResponse": {
+    "name": "net/respawner/orienteeringmod/MsgGradeRequest$MsgResponse",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessage"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgGradeRequest$MsgResponse$MsgResponseHandler": {
+    "name": "net/respawner/orienteeringmod/MsgGradeRequest$MsgResponse$MsgResponseHandler",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessageHandler"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgMatchClient": {
+    "name": "net/respawner/orienteeringmod/MsgMatchClient",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessage"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgMatchClient$MsgPJHandler": {
+    "name": "net/respawner/orienteeringmod/MsgMatchClient$MsgPJHandler",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessageHandler"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgPlayerClicksPoint": {
+    "name": "net/respawner/orienteeringmod/MsgPlayerClicksPoint",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessage"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgPlayerClicksPoint$MsgPCPHandler": {
+    "name": "net/respawner/orienteeringmod/MsgPlayerClicksPoint$MsgPCPHandler",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessageHandler"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgPlayerClicksPoint$MsgResponse": {
+    "name": "net/respawner/orienteeringmod/MsgPlayerClicksPoint$MsgResponse",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessage"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgPlayerClicksPoint$MsgResponse$MsgResponseHandler": {
+    "name": "net/respawner/orienteeringmod/MsgPlayerClicksPoint$MsgResponse$MsgResponseHandler",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessageHandler"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgSetCP": {
+    "name": "net/respawner/orienteeringmod/MsgSetCP",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessage"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgSetCP$MsgSetCPHandler": {
+    "name": "net/respawner/orienteeringmod/MsgSetCP$MsgSetCPHandler",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessageHandler"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgTimePenalty": {
+    "name": "net/respawner/orienteeringmod/MsgTimePenalty",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessage"
+    ]
+  },
+  "net/respawner/orienteeringmod/MsgTimePenalty$MsgTPHandler": {
+    "name": "net/respawner/orienteeringmod/MsgTimePenalty$MsgTPHandler",
+    "interfaces": [
+      "net/minecraftforge/fml/common/network/simpleimpl/IMessageHandler"
+    ]
+  },
+  "net/respawner/orienteeringmod/NonOriginal": {
+    "name": "net/respawner/orienteeringmod/NonOriginal",
+    "interfaces": [
+      "java/lang/annotation/Annotation"
+    ]
+  },
+  "net/respawner/orienteeringmod/ORTMatch": {
+    "name": "net/respawner/orienteeringmod/ORTMatch",
+    "interfaces": [
+      "java/io/Serializable"
+    ]
+  },
+  "net/respawner/orienteeringmod/ORTPlayer": {
+    "name": "net/respawner/orienteeringmod/ORTPlayer",
+    "interfaces": [
+      "java/io/Serializable"
+    ]
+  },
+  "net/respawner/orienteeringmod/OrienteeringMod": {
+    "name": "net/respawner/orienteeringmod/OrienteeringMod",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/Mod;",
+        "target": "net/respawner/orienteeringmod/OrienteeringMod",
+        "values": {
+          "acceptedMinecraftVersions": {
+            "value": "[1.12.2]"
+          },
+          "modid": {
+            "value": "orienteeringmod"
+          },
+          "name": {
+            "value": "Orienteering Mod"
+          },
+          "version": {
+            "value": "4.1"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/Mod$EventHandler;",
+        "target": "preInit(Lnet/minecraftforge/fml/common/event/FMLPreInitializationEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/Mod$EventHandler;",
+        "target": "init(Lnet/minecraftforge/fml/common/event/FMLInitializationEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/Mod$EventHandler;",
+        "target": "postInit(Lnet/minecraftforge/fml/common/event/FMLPostInitializationEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/Mod$EventHandler;",
+        "target": "onServerStarting(Lnet/minecraftforge/fml/common/event/FMLServerStartingEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/Mod$EventHandler;",
+        "target": "onServerStopping(Lnet/minecraftforge/fml/common/event/FMLServerStoppingEvent;)V"
+      }
+    ]
+  },
+  "net/respawner/orienteeringmod/OrienteeringMod$InGameResponseServer": {
+    "name": "net/respawner/orienteeringmod/OrienteeringMod$InGameResponseServer",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/Mod$EventBusSubscriber;",
+        "target": "net/respawner/orienteeringmod/OrienteeringMod$InGameResponseServer",
+        "values": {
+          "modid": {
+            "value": "orienteeringmod"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "onPlayerJoins(Lnet/minecraftforge/event/entity/EntityJoinWorldEvent;)Z"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "onPlayerDeath(Lnet/minecraftforge/event/entity/living/LivingDeathEvent;)Z"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "OnFalling(Lnet/minecraftforge/event/entity/living/LivingAttackEvent;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "ORTPlayerUpdate(Lnet/minecraftforge/event/entity/living/LivingEvent$LivingUpdateEvent;)V"
+      }
+    ]
+  },
+  "net/respawner/orienteeringmod/OrienteeringMod$IngameResponseClient": {
+    "name": "net/respawner/orienteeringmod/OrienteeringMod$IngameResponseClient",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/Mod$EventBusSubscriber;",
+        "target": "net/respawner/orienteeringmod/OrienteeringMod$IngameResponseClient",
+        "values": {
+          "modid": {
+            "value": "orienteeringmod"
+          },
+          "value": {
+            "type": "ENUM",
+            "values": [
+              "Lnet/minecraftforge/fml/relauncher/Side;/CLIENT"
+            ]
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "clientUpdate(Lnet/minecraftforge/client/event/RenderGameOverlayEvent$Post;)V"
+      }
+    ]
+  },
+  "net/respawner/orienteeringmod/OrienteeringMod$ModInit": {
+    "name": "net/respawner/orienteeringmod/OrienteeringMod$ModInit",
+    "annotations": [
+      {
+        "type": "CLASS",
+        "name": "Lnet/minecraftforge/fml/common/Mod$EventBusSubscriber;",
+        "target": "net/respawner/orienteeringmod/OrienteeringMod$ModInit",
+        "values": {
+          "modid": {
+            "value": "orienteeringmod"
+          }
+        }
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "registerBlock(Lnet/minecraftforge/event/RegistryEvent$Register;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "registerItem(Lnet/minecraftforge/event/RegistryEvent$Register;)V"
+      },
+      {
+        "type": "METHOD",
+        "name": "Lnet/minecraftforge/fml/common/eventhandler/SubscribeEvent;",
+        "target": "registryModel(Lnet/minecraftforge/client/event/ModelRegistryEvent;)V"
+      }
+    ]
+  },
+  "net/respawner/orienteeringmod/PlayerGroupRelay": {
+    "name": "net/respawner/orienteeringmod/PlayerGroupRelay",
+    "interfaces": [
+      "net/respawner/orienteeringmod/IPlayerGroup"
+    ]
+  },
+  "net/respawner/orienteeringmod/PlayerGroupSingle": {
+    "name": "net/respawner/orienteeringmod/PlayerGroupSingle",
+    "interfaces": [
+      "net/respawner/orienteeringmod/IPlayerGroup"
+    ]
+  },
+  "net/respawner/orienteeringmod/PlayerGroupTeam": {
+    "name": "net/respawner/orienteeringmod/PlayerGroupTeam",
+    "interfaces": [
+      "net/respawner/orienteeringmod/IPlayerGroup"
+    ]
+  },
+  "net/respawner/orienteeringmod/Track$ExportTrack": {
+    "name": "net/respawner/orienteeringmod/Track$ExportTrack",
+    "interfaces": [
+      "java/lang/Runnable"
+    ]
+  },
+  "net/respawner/orienteeringmod/Util": {
+    "name": "net/respawner/orienteeringmod/Util",
+    "annotations": [
+      {
+        "type": "METHOD",
+        "name": "Lnet/respawner/orienteeringmod/NonOriginal;",
+        "target": "isPermitted(Lnet/minecraft/world/World;DDD)Z"
+      }
+    ]
+  }
+}

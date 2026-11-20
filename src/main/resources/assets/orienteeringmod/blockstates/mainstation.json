@@ -1,0 +1,7 @@
+{
+    "variants": {
+        "normal": {
+            "model": "orienteeringmod:mainstation_model"
+        }
+    }
+}
