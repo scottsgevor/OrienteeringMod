@@ -176,7 +176,7 @@
 
 | 字段 | 类型 | 默认 | 说明 |
 |---|---|---|---|
-| `forceFoodLevel` | boolean | `false` | `false` 时不强制锁定饥饿值，原版或 VitalSpeed 的饥饿机制正常工作；`true` 时比赛进行中每 tick 将饥饿值固定为 15，非比赛时固定为 20。 |
+| `forceFoodLevel` | boolean | `false` | `false` 时不强制锁定饥饿值，原版或其他模组的饥饿机制正常工作；`true` 时比赛进行中每 tick 将饥饿值固定为 15，非比赛时固定为 20。 |
 
 ### 4.2 轨迹数据
 
