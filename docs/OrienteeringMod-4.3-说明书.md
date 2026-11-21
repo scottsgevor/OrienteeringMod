@@ -23,7 +23,9 @@
    ├─ 1_statdetail.txt            成统明细
    ├─ cartography.json            制图配置
    ├─ ground.png                  制图输出
-   └─ foliage.png                 制图输出
+   ├─ foliage.png                 树冠与等高线
+   ├─ ground-height.png           地面高程分层设色图
+   └─ ground-height.csv           逐格地面高度
 ```
 
 说明：
@@ -242,7 +244,11 @@
 制图会扫描存档并把不同方块用不同颜色表示，输出：
 
 - `ground.png`：人工认定的地面方块。
-- `foliage.png`：从高处向下探测到的最高非空气方块。
+- `foliage.png`：按配置显示树冠与地表，并叠加以世界 Y 坐标为基准、等高距 5 格的棕色等高线。
+- `ground-height.png`：每 1 格高度单独设色，附本次扫描的高程图例。
+- `ground-height.csv`：首行为世界 X 坐标，首列为 Z 坐标，每个单元格记录对应地面的 Y 值。
+
+高程从上往下取有效地面，跳过树冠、树干等覆盖物。优先使用 Y > 50 的地面，上方没有有效地面时才向下查找。
 
 制图只在单人可用；检测到比赛文件时禁用，防止比赛中使用。扫描区域必须提前生成，否则区块生成可能导致游戏崩溃。制图可能耗时一分钟以上。
 
@@ -253,7 +259,7 @@
   "regionNW": [-500, -500],
   "regionSE": [500, 500],
   "maxairgap": 5,
-  "displaygap": ["minecraft:oak_leaves"],
+  "displaygap": ["minecraft:leaves"],
   "decrease": 3,
   "emph": ["minecraft:log"],
   "ground": [
@@ -262,7 +268,7 @@
   ],
   "penetrate": ["minecraft:air"],
   "foliage": [
-    { "material": "minecraft:oak_leaves", "R": 40, "G": 120, "B": 30 }
+    { "material": "minecraft:leaves", "R": 40, "G": 120, "B": 30 }
   ]
 }
 ```
@@ -274,10 +280,10 @@
 | `regionNW` / `regionSE` | 扫描区域左上角和右下角的 `[x, z]` 坐标。 |
 | `maxairgap` | 连续空气达到该值后，空气底部视为地面。 |
 | `displaygap` | 用 gap 深度调整颜色的方块列表。 |
-| `decrease` | 每格 gap 对 RGB 的偏移量。 |
+| `decrease` | 每格 gap 对 RGB 的偏移量，省略时取 0。 |
 | `emph` | 探测到这些方块时立即停止。 |
 | `ground` | 地面方块及其 RGB 颜色。 |
 | `penetrate` | 视为空气、忽略的方块。 |
-| `foliage` | 从高向低探测时优先显示的方块及颜色。 |
+| `foliage` | 从高向低探测时优先显示的方块及颜色。未单独配置 `minecraft:leaves2` 时沿用 `minecraft:leaves` 的颜色。 |
 
-填写后在存档内执行 `/ORT sketch`，生成的 `ground.png` 和 `foliage.png` 位于对应比赛目录。
+填写后在存档内执行 `/ORT sketch`，看到 `Export complete` 提示后，可在对应比赛目录查看四个输出文件。
