@@ -1,6 +1,6 @@
-# OrienteeringMod 4.3 使用说明
+# OrienteeringMod 4.4 使用说明
 
-> 本文档对应 OrienteeringMod 1.12.2 4.3。Word 版仅保留作旧格式参考；配置字段、命令和代码示例以本 Markdown 为准。
+> 本文档对应 OrienteeringMod 1.12.2 4.4。Word 版仅保留作旧格式参考；配置字段、命令和代码示例以本 Markdown 为准。
 
 ## 1. 文件管理
 

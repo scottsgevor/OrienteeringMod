@@ -66,11 +66,11 @@ import net.respawner.orienteeringmod.Track;
 import net.respawner.orienteeringmod.Util;
 import org.apache.logging.log4j.LogManager;
 
-@Mod(modid="orienteeringmod", name="Orienteering Mod", version="4.3", acceptedMinecraftVersions="[1.12.2]")
+@Mod(modid="orienteeringmod", name="Orienteering Mod", version="4.4", acceptedMinecraftVersions="[1.12.2]")
 public class OrienteeringMod {
     public static final String MODID = "orienteeringmod";
     public static final String NAME = "Orienteering Mod";
-    public static final String VERSION = "4.3";
+    public static final String VERSION = "4.4";
     public static final long SerialVersion = 4L;
     public static final int MatchseedVersion = 4;
     public static final SimpleNetworkWrapper NETHANDLER = NetworkRegistry.INSTANCE.newSimpleChannel("orienteeringmod");
