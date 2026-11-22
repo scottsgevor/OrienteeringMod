@@ -506,16 +506,19 @@ extends CommandBase {
                 Util.sendMessage(player, "The current world does not have a match.");
                 return;
             }
+            int penalty = ORTWorld.getMatchInstanceServer().match.getDeathPenalty();
             BlockPos pos = Util.randomRespawn(player.field_70170_p, player.field_70165_t, player.field_70163_u, player.field_70161_v, 30);
             player.func_70634_a(pos.func_177958_n(), pos.func_177956_o(), pos.func_177952_p());
-            OrienteeringMod.NETHANDLER.sendTo(new MsgTimePenalty(6000L), player);
-            Util.sendMessage(player, "Teleporting... (this costs 5 min.)");
             ORTPlayer p = ORTWorld.getMatchInstanceServer().getPlayerByName(player.func_70005_c_());
-            if (p == null) {
-                Util.sendMessage(player, "Action failed. You are not registered in the player roster.");
-                return;
+            if (p != null && p.isInMatchProgress()) {
+                if (penalty > 0) {
+                    OrienteeringMod.NETHANDLER.sendTo(new MsgTimePenalty(penalty * 1200L), player);
+                }
+                Util.sendMessage(player, "Teleporting... Time penalty: " + penalty + " min (as a death)");
+                p.addDeath();
+            } else {
+                Util.sendMessage(player, "Teleporting...");
             }
-            p.addDeath();
         }
         if (args[0].equals("back")) {
             if (!ORTWorld.hasMatchServer()) {

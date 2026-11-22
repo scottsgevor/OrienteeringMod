@@ -201,7 +201,7 @@
 | `/ORT changeMode` | Admin | 在 `training`、`match`、`admin` 之间切换比赛模式；游戏内和控制台均可。 |
 | `/ORT stat` | 无 | 进行成统；游戏内和服务端控制台均可执行。 |
 | `/ORT sketch` | SP | 扫描地图；仅单人且当前没有加载比赛时可用。 |
-| `/ORT stuck` | 比赛中 | 卡住时随机传送，罚时 5 分钟并记录一次死亡。 |
+| `/ORT stuck` | 已加载比赛 | 卡住时随机传送到附近地表；比赛进行中按 `deathpenalty` 记录一次死亡扣时，不在赛中仅提示 `Teleporting...`。 |
 | `/ORT back` | 比赛中 | 传送到最近一次打卡的检查点；尚未打卡时传送到实际开赛位置（没有记录时回退赛事中心）。按 `backpenalty` 扣时并计入最终成绩。 |
 
 可在服务端控制台执行的指令：`generate`、`loadMatch`、`openMatch`、`closeMatch`、`clearPlayers`、`changeMode`、`stat`。其余指令需要以玩家身份执行。
