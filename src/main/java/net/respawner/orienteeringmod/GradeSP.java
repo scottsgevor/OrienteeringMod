@@ -8,7 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import net.minecraft.entity.player.EntityPlayer;
 import net.respawner.orienteeringmod.IGrade;
 import net.respawner.orienteeringmod.ORTFileException;
@@ -26,6 +28,7 @@ implements IGrade {
     protected final List<Integer> CPHistory;
     protected final List<Boolean> correctnessList;
     protected final List<Long> timeHistory;
+    protected final List<ORTPlayer.BackRecord> backRecords;
     protected final int correctCPNumber;
     protected final long totalTime;
     protected final long totalTimeWithPenalty;
@@ -40,6 +43,7 @@ implements IGrade {
         this.CPHistory = new ArrayList<Integer>(player.getCPHistory());
         this.correctnessList = correctnessList;
         this.timeHistory = new ArrayList<Long>(player.getTimeHistory());
+        this.backRecords = new ArrayList<ORTPlayer.BackRecord>(player.getBackRecords());
         this.correctCPNumber = correctCPNumber;
         this.totalTime = totalTime;
         this.totalTimeWithPenalty = totalTimeWithPenalty;
@@ -72,6 +76,7 @@ implements IGrade {
         Util.sendMessage(player, "Your match status is: " + (Object)((Object)this.playerStatus));
         Util.sendMessage(player, "Qualified: " + (this.isQualified ? "Yes." : "No."));
         Util.sendMessage(player, "Your total time: " + Util.timeTranslation(this.totalTimeWithPenalty) + " (death: " + this.deathCount + ")");
+        Util.sendMessage(player, "Back uses: " + this.backRecordsView().size() + ".");
         Util.sendMessage(player, "For more details, see the file \".minecraft\\.orienteering\\" + this.matchName + "_" + this.playerName + ".txt\"");
     }
 
@@ -110,6 +115,7 @@ implements IGrade {
         file.write("The player is " + (this.isQualified ? "" : "not ") + "qualified.\r\n");
         file.write("The game time is " + Util.timeTranslation(this.totalTime) + "\r\n");
         file.write("Death count: " + this.deathCount + "\r\n");
+        file.write("Back count: " + this.backRecordsView().size() + "\r\n");
         file.write("The total time is " + Util.timeTranslation(this.totalTimeWithPenalty) + "\r\n");
     }
 
@@ -129,6 +135,25 @@ implements IGrade {
             Line = Line + Util.timeTranslation(this.timeHistory.get(i));
             file.write(Line + "\r\n");
         }
+        if (!this.backRecordsView().isEmpty()) {
+            file.write("\r\nBack records:\r\n");
+            List<ORTPlayer.BackRecord> records = this.backRecordsView();
+            for (int i = 0; i < records.size(); ++i) {
+                ORTPlayer.BackRecord record = records.get(i);
+                file.write("  " + (i + 1) + "   " + Util.timeTranslation(record.matchTime)
+                        + "   " + record.getTargetName()
+                        + "   target (" + GradeSP.formatPosition(record.targetX, record.targetY, record.targetZ) + ")"
+                        + "   from (" + GradeSP.formatPosition(record.fromX, record.fromY, record.fromZ) + ")\r\n");
+            }
+        }
+    }
+
+    private static String formatPosition(double x, double y, double z) {
+        return String.format(Locale.ROOT, "%.1f, %.1f, %.1f", x, y, z);
+    }
+
+    private List<ORTPlayer.BackRecord> backRecordsView() {
+        return this.backRecords == null ? Collections.<ORTPlayer.BackRecord>emptyList() : this.backRecords;
     }
 
     @Override

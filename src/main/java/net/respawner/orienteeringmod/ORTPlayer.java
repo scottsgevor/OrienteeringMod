@@ -19,6 +19,8 @@ import org.apache.logging.log4j.LogManager;
 public class ORTPlayer
 implements Serializable {
     private static final long serialVersionUID = 3L;
+    public static final int BACK_TARGET_START = -2;
+    public static final int BACK_TARGET_SPAWN = -3;
     public final String playerName;
     private List<Integer> CPHistory = new ArrayList<Integer>();
     private List<Long> timeHistory = new ArrayList<Long>();
@@ -30,6 +32,16 @@ implements Serializable {
     public boolean nightVision = false;
     public boolean displayTime = false;
     public long lastShovelUsedTime = 0L;
+    private boolean hasLastCPPosition = false;
+    private double lastCPX;
+    private double lastCPY;
+    private double lastCPZ;
+    private boolean hasStartPosition = false;
+    private double startX;
+    private double startY;
+    private double startZ;
+    private long extraTimePenalty = 0L;
+    private List<BackRecord> backRecords = new ArrayList<BackRecord>();
 
     public long getBeginningTime() {
         return this.beginningTime;
@@ -75,6 +87,57 @@ implements Serializable {
         return this.deathCount;
     }
 
+    public int getLastCPCode() {
+        return this.CPHistory.isEmpty() ? Integer.MIN_VALUE
+                : this.CPHistory.get(this.CPHistory.size() - 1).intValue();
+    }
+
+    public List<BackRecord> getBackRecords() {
+        if (this.backRecords == null) {
+            this.backRecords = new ArrayList<BackRecord>();
+        }
+        return this.backRecords;
+    }
+
+    public void addBackRecord(long matchTime, int targetCode, double targetX, double targetY,
+                              double targetZ, double fromX, double fromY, double fromZ) {
+        this.getBackRecords().add(new BackRecord(matchTime, targetCode, targetX, targetY, targetZ,
+                fromX, fromY, fromZ));
+    }
+
+    public boolean hasLastCPPosition() {
+        return this.hasLastCPPosition;
+    }
+
+    public double[] getLastCPPosition() {
+        return this.hasLastCPPosition ? new double[]{this.lastCPX, this.lastCPY, this.lastCPZ} : null;
+    }
+
+    public boolean hasStartPosition() {
+        return this.hasStartPosition;
+    }
+
+    public double[] getStartPosition() {
+        return this.hasStartPosition ? new double[]{this.startX, this.startY, this.startZ} : null;
+    }
+
+    public void recordStartPosition(double x, double y, double z) {
+        this.hasStartPosition = true;
+        this.startX = x;
+        this.startY = y;
+        this.startZ = z;
+    }
+
+    public long getExtraTimePenalty() {
+        return this.extraTimePenalty;
+    }
+
+    public void addTimePenalty(long penalty) {
+        if (penalty > 0L) {
+            this.extraTimePenalty += penalty;
+        }
+    }
+
     private ORTPlayer(String name) {
         this.playerName = name;
     }
@@ -98,7 +161,19 @@ implements Serializable {
         this.timeHistory = new ArrayList<Long>();
         this.beginningTime = time;
         this.lastCPTime = time;
+        this.hasLastCPPosition = false;
+        this.hasStartPosition = false;
+        this.extraTimePenalty = 0L;
+        this.backRecords = new ArrayList<BackRecord>();
         return true;
+    }
+
+    public void checkpoint(int code, long time, double x, double y, double z) {
+        this.hasLastCPPosition = true;
+        this.lastCPX = x;
+        this.lastCPY = y;
+        this.lastCPZ = z;
+        this.checkpoint(code, time);
     }
 
     public void checkpoint(int code, long time) {
@@ -173,6 +248,38 @@ implements Serializable {
         Finished,
         Aborted;
 
+    }
+
+    public static class BackRecord
+    implements Serializable {
+        private static final long serialVersionUID = 1L;
+        public final long matchTime;
+        public final int targetCode;
+        public final double targetX;
+        public final double targetY;
+        public final double targetZ;
+        public final double fromX;
+        public final double fromY;
+        public final double fromZ;
+
+        public BackRecord(long matchTime, int targetCode, double targetX, double targetY,
+                          double targetZ, double fromX, double fromY, double fromZ) {
+            this.matchTime = matchTime;
+            this.targetCode = targetCode;
+            this.targetX = targetX;
+            this.targetY = targetY;
+            this.targetZ = targetZ;
+            this.fromX = fromX;
+            this.fromY = fromY;
+            this.fromZ = fromZ;
+        }
+
+        public String getTargetName() {
+            if (this.targetCode >= 0) {
+                return "CP " + this.targetCode;
+            }
+            return this.targetCode == ORTPlayer.BACK_TARGET_START ? "START" : "SPAWN";
+        }
     }
 }
 

@@ -12,6 +12,7 @@ import net.minecraft.block.BlockOre;
 import net.minecraft.block.BlockStone;
 import net.minecraft.block.BlockWeb;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -37,6 +38,10 @@ public final class Util {
 
     public static void sendMessage(EntityPlayer player, String str) {
         player.func_145747_a(new TextComponentTranslation(str, new Object[0]));
+    }
+
+    public static void sendMessage(ICommandSender sender, String str) {
+        sender.func_145747_a(new TextComponentTranslation(str, new Object[0]));
     }
 
     public static boolean isORTBLock(IBlockState state) {

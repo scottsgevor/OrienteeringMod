@@ -41,6 +41,7 @@ implements Serializable {
     private boolean isMatchStarted;
     private final DeathPolicy deathPolicy;
     private final int deathPenalty;
+    private Integer backPenalty;
     private final int spawnRadius;
     private final boolean drawCompass;
     private final boolean nightVision;
@@ -68,6 +69,10 @@ implements Serializable {
 
     public int getDeathPenalty() {
         return this.deathPenalty;
+    }
+
+    public int getBackPenalty() {
+        return this.backPenalty == null ? 5 : this.backPenalty.intValue();
     }
 
     public int getSpawnRadius() {
@@ -295,6 +300,9 @@ implements Serializable {
                 this.deathPenalty = 0;
                 this.spawnRadius = 0;
             }
+            this.backPenalty = seed.has("backpenalty")
+                    ? Integer.valueOf(Math.max(0, seed.get("backpenalty").getAsInt()))
+                    : Integer.valueOf(5);
             this.drawCompass = seed.get("drawcompass").getAsBoolean();
             this.nightVision = seed.get("nightvision").getAsBoolean();
             this.customFallDamage = seed.has("customfalldamage")
