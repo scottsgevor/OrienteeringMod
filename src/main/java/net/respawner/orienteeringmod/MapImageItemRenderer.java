@@ -62,16 +62,19 @@ public class MapImageItemRenderer extends TileEntityItemStackRenderer {
 
         float halfWidth = width / 2.0f;
         float halfHeight = height / 2.0f;
-        boolean flipU = renderingHand == EnumHand.OFF_HAND;
-        float uLeft = flipU ? 1.0f : 0.0f;
-        float uRight = flipU ? 0.0f : 1.0f;
+        float[] window = MapImageClientCache.window(ref);
+        boolean offhand = renderingHand == EnumHand.OFF_HAND;
+        float uLeft = offhand ? window[2] : window[0];
+        float uRight = offhand ? window[0] : window[2];
+        float vTop = offhand ? window[3] : window[1];
+        float vBottom = offhand ? window[1] : window[3];
         Tessellator tessellator = Tessellator.func_178181_a();
         BufferBuilder buffer = tessellator.func_178180_c();
         buffer.func_181668_a(7, DefaultVertexFormats.field_181707_g);
-        buffer.func_181662_b(-halfWidth, halfHeight, 0.0).func_187315_a(uLeft, 0.0).func_181675_d();
-        buffer.func_181662_b(halfWidth, halfHeight, 0.0).func_187315_a(uRight, 0.0).func_181675_d();
-        buffer.func_181662_b(halfWidth, -halfHeight, 0.0).func_187315_a(uRight, 1.0).func_181675_d();
-        buffer.func_181662_b(-halfWidth, -halfHeight, 0.0).func_187315_a(uLeft, 1.0).func_181675_d();
+        buffer.func_181662_b(-halfWidth, halfHeight, 0.0).func_187315_a(uLeft, vTop).func_181675_d();
+        buffer.func_181662_b(halfWidth, halfHeight, 0.0).func_187315_a(uRight, vTop).func_181675_d();
+        buffer.func_181662_b(halfWidth, -halfHeight, 0.0).func_187315_a(uRight, vBottom).func_181675_d();
+        buffer.func_181662_b(-halfWidth, -halfHeight, 0.0).func_187315_a(uLeft, vBottom).func_181675_d();
         tessellator.func_78381_a();
 
         GlStateManager.func_179084_k();

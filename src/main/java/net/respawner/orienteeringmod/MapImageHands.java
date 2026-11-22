@@ -38,6 +38,24 @@ public final class MapImageHands {
         return MapImageRef.fromStack(player.func_184586_b(EnumHand.OFF_HAND));
     }
 
+    public static MapImageRef primaryTwoHanded(EntityPlayer player) {
+        if (player == null) {
+            return null;
+        }
+        MapImageRef main = MapImageRef.fromStack(player.func_184586_b(EnumHand.MAIN_HAND));
+        if (main == null || !player.func_184586_b(EnumHand.OFF_HAND).func_190926_b()) {
+            return null;
+        }
+        return main;
+    }
+
+    public static boolean isTwoHanded(EntityPlayer player, MapImageRef wanted) {
+        MapImageRef main = primaryTwoHanded(player);
+        return main != null && wanted != null
+                && main.getMatch().equals(wanted.getMatch())
+                && main.getImage().equals(wanted.getImage());
+    }
+
     public static boolean holds(EntityPlayer player, MapImageRef wanted) {
         if (wanted == null) {
             return false;

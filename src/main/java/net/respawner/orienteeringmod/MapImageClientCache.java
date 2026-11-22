@@ -21,6 +21,8 @@ import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public final class MapImageClientCache {
+    public static final float MIN_ZOOM = 1.0f;
+    public static final float MAX_ZOOM = 8.0f;
     private static final Map<String, Entry> ENTRIES = new HashMap<String, Entry>();
     private static final AtomicInteger NEXT_TEXTURE_ID = new AtomicInteger();
     private static final int MAX_TEXTURE_SIZE = 4096;
@@ -171,6 +173,50 @@ public final class MapImageClientCache {
         }
     }
 
+    public static float zoom(MapImageRef ref) {
+        Entry entry = get(ref);
+        return entry == null ? MIN_ZOOM : entry.zoom;
+    }
+
+    public static float[] window(MapImageRef ref) {
+        if (ref == null) {
+            return new float[] { 0.0f, 0.0f, 1.0f, 1.0f };
+        }
+        synchronized (ENTRIES) {
+            Entry entry = getOrCreate(ref);
+            float half = 0.5f / entry.zoom;
+            float centerU = Math.max(half, Math.min(1.0f - half, entry.centerU));
+            float centerV = Math.max(half, Math.min(1.0f - half, entry.centerV));
+            return new float[] { centerU - half, centerV - half, centerU + half, centerV + half };
+        }
+    }
+
+    public static float zoomAt(MapImageRef ref, float factor, float s, float t) {
+        if (ref == null) {
+            return MIN_ZOOM;
+        }
+        synchronized (ENTRIES) {
+            Entry entry = getOrCreate(ref);
+            float oldZoom = entry.zoom;
+            float oldHalf = 0.5f / oldZoom;
+            float oldCenterU = Math.max(oldHalf, Math.min(1.0f - oldHalf, entry.centerU));
+            float oldCenterV = Math.max(oldHalf, Math.min(1.0f - oldHalf, entry.centerV));
+            float imageU = oldCenterU - oldHalf + s * oldHalf * 2.0f;
+            float imageV = oldCenterV - oldHalf + t * oldHalf * 2.0f;
+            float newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, oldZoom * factor));
+            if (Math.abs(newZoom - oldZoom) < 0.0001f) {
+                return oldZoom;
+            }
+            float newHalf = 0.5f / newZoom;
+            entry.centerU = Math.max(newHalf, Math.min(1.0f - newHalf,
+                    imageU + (0.5f - s) * newHalf * 2.0f));
+            entry.centerV = Math.max(newHalf, Math.min(1.0f - newHalf,
+                    imageV + (0.5f - t) * newHalf * 2.0f));
+            entry.zoom = newZoom;
+            return newZoom;
+        }
+    }
+
     private static void markFailed(Entry entry) {
         entry.failed = true;
         entry.requested = false;
@@ -221,8 +267,8 @@ public final class MapImageClientCache {
                 BufferedImage image = null;
                 try {
                     image = ImageIO.read(new ByteArrayInputStream(data));
-                    if (image != null && (image.getWidth() > maxTextureSize || image.getHeight() > maxTextureSize)) {
-                        image = scaleToFit(image, maxTextureSize);
+                    if (image != null) {
+                        image = prepareImage(image, maxTextureSize);
                     }
                 }
                 catch (Throwable e) {
@@ -282,8 +328,9 @@ public final class MapImageClientCache {
         }
     }
 
-    private static BufferedImage scaleToFit(BufferedImage source, int maxSize) {
-        double scale = Math.min((double) maxSize / (double) source.getWidth(), (double) maxSize / (double) source.getHeight());
+    private static BufferedImage prepareImage(BufferedImage source, int maxSize) {
+        double scale = Math.min(1.0D, Math.min((double) maxSize / (double) source.getWidth(),
+                (double) maxSize / (double) source.getHeight()));
         int width = Math.max(1, (int) Math.round(source.getWidth() * scale));
         int height = Math.max(1, (int) Math.round(source.getHeight() * scale));
         BufferedImage result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -291,7 +338,8 @@ public final class MapImageClientCache {
         try {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            graphics.drawImage(source, 0, 0, width, height, null);
+            graphics.drawImage(source, 0, 0, width, height,
+                    0, source.getHeight(), source.getWidth(), 0, null);
         }
         finally {
             graphics.dispose();
@@ -304,6 +352,9 @@ public final class MapImageClientCache {
         volatile int width;
         volatile int height;
         volatile int rotation;
+        volatile float zoom = MIN_ZOOM;
+        volatile float centerU = 0.5f;
+        volatile float centerV = 0.5f;
         volatile boolean requested;
         volatile boolean decoding;
         volatile boolean failed;
