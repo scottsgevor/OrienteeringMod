@@ -1,8 +1,8 @@
-# OrienteeringMod 4.3
+# OrienteeringMod 4.4
 
 Minecraft Forge 1.12.2 定向越野比赛 Mod。提供检查点、起点/终点、路线、比赛管理、成统、轨迹和制图功能。
 
-完整使用说明见 [docs/OrienteeringMod-4.3-说明书.md](docs/OrienteeringMod-4.3-说明书.md)。
+完整使用说明见 [docs/OrienteeringMod-4.4-说明书.md](docs/OrienteeringMod-4.4-说明书.md)。
 
 ## 仓库结构
 
@@ -39,7 +39,7 @@ python build.py
 输出：
 
 ```text
-build/OrienteeringMod-4.3-rebuilt.jar
+build/OrienteeringMod-4.4.jar
 ```
 
 默认 Minecraft 目录是 `%APPDATA%\.minecraft`；可用 `MC_HOME` 指定其他游戏目录，用 `JAVA8_HOME` 指定 Java 8。
@@ -48,4 +48,4 @@ build/OrienteeringMod-4.3-rebuilt.jar
 
 ## 说明
 
-源码由原版 4.x JAR 反编译恢复，保留 Forge/SRG 方法名；没有恢复原开发工程的注释和构建配置。提交时请不要包含 `build/`、本地生成的 jar、日志、IDE 配置或其他 mod 的文件。
+本仓库是 OrienteeringMod 的官方源码仓库。源码由原版 4.x JAR 反编译恢复后在此继续维护，保留 Forge/SRG 方法名；没有恢复原开发工程的注释和构建配置。提交时请不要包含 `build/`、本地生成的 jar、日志、IDE 配置或其他 mod 的文件。

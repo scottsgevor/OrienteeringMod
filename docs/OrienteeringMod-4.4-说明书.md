@@ -1,6 +1,6 @@
-# OrienteeringMod 4.3 使用说明
+# OrienteeringMod 4.4 使用说明
 
-> 本文档对应 OrienteeringMod 1.12.2 4.3。Word 版仅保留作旧格式参考；配置字段、命令和代码示例以本 Markdown 为准。
+> 本文档对应 OrienteeringMod 1.12.2 4.4。Word 版仅保留作旧格式参考；配置字段、命令和代码示例以本 Markdown 为准。
 
 ## 1. 文件管理
 
@@ -20,7 +20,7 @@
    ├─ matchseed.json              比赛源文件
    ├─ roster.json                 选手名册
    ├─ 0_stat.txt                  成统总表
-   ├─ 1_statdetail.txt            成统明细
+   ├─ 1_statdetail.txt            成统明细（含 back 记录）
    ├─ cartography.json            制图配置
    ├─ ground.png                  制图输出
    ├─ foliage.png                 树冠与等高线
@@ -62,6 +62,7 @@
   "defaultcourse": "course1",
   "deathpolicy": "penalty",
   "deathpenalty": 0,
+  "backpenalty": 5,
   "spawnradius": 3,
   "drawcompass": true,
   "nightvision": true,
@@ -95,15 +96,16 @@
 | `announcestart` | boolean | 是否需要管理员用 `/ORT openMatch` 和 `/ORT closeMatch` 手动开关比赛。 |
 | `defaultcourse` | string | 没有通过名册分配路线时使用的默认路线。 |
 | `deathpolicy` | string | `penalty` 或 `abort`。`penalty`：扣时并在出生半径内重生；`abort`：死亡后直接结束比赛并 DSQ。 |
-| `deathpenalty` | int | 死亡扣时。1 点 = 600 ticks（30 秒）。仅 `penalty` 使用。 |
+| `deathpenalty` | int | 死亡扣时，单位分钟（1 点 = 1 分钟）。仅 `penalty` 使用。 |
+| `backpenalty` | int | `/ORT back` 的扣时，单位分钟，省略时默认 `5`；`0` 表示不罚时。计入最终成绩。 |
 | `spawnradius` | int | 死亡后随机重生的半径。仅 `penalty` 使用。 |
 | `drawcompass` | boolean | 是否显示指北针。 |
 | `nightvision` | boolean | 是否给予夜视效果。 |
 | `customfalldamage` | boolean | 是否使用 ORT 特殊摔落规则，默认 `true`，详见 3.4。 |
 | `spawn` | int[3] | 赛事中心的 `[x, y, z]`，完成比赛或死亡后回到这里。 |
-| `admin` | string[] | 管理员名单。管理员拥有命令权限和 F3 等权限。 |
+| `admin` | string[] | 管理员名单。列出的玩家拥有 ORT 管理权限；在线原版 OP 也视为 ORT 管理员。ORT 管理员不会自动获得原版 OP。 |
 | `spectator` | string[] | 旁观者名单，进入后为旁观模式。不能与管理员名单重合。 |
-| `worldmode` | string | `training`、`match`、`admin`。`training` 可反复开始；`match` 每名玩家只能开始一次；`admin` 下所有人都是管理员。 |
+| `worldmode` | string | `training`、`match`、`admin`。`training` 可反复开始；`match` 每名玩家只能开始一次；`admin` 下所有人都是 ORT 管理员（不会自动授予原版 OP）。 |
 | `courses` | object[] | 路线列表，见 3.2。 |
 
 
@@ -188,24 +190,28 @@
 
 | 命令 | 权限 | 说明 |
 |---|---|---|
-| `/ORT generate [比赛名]` | SP/MP | 生成并加载比赛。单机可省略比赛名，使用世界名。 |
-| `/ORT loadMatch [name]` | MP | 在专用服务器加载比赛。 |
-| `/ORT openMatch` | Admin | 宣布比赛开始。 |
-| `/ORT closeMatch` | Admin | 宣布比赛结束。 |
+| `/ORT generate [比赛名]` | SP/MP | 生成并加载比赛。单机可省略比赛名，使用世界名；控制台执行时必须指定比赛名。 |
+| `/ORT loadMatch [name]` | MP | 在专用服务器加载比赛；游戏内和控制台均可。 |
+| `/ORT openMatch` | Admin | 宣布比赛开始；游戏内和控制台均可。 |
+| `/ORT closeMatch` | Admin | 宣布比赛结束；游戏内和控制台均可。 |
 | `/ORT home` | 非比赛中 | 立即传送回赛事中心。 |
-| `/ORT clearPlayers` | Admin | 清除所有选手的比赛数据。 |
+| `/ORT clearPlayers` | Admin | 清除所有选手的比赛数据；游戏内和控制台均可。 |
 | `/ORT getCourse` | 无 | 获取当前玩家的路线名。 |
 | `/ORT changeCourse [name]` | 非接力、非进行中 | 切换路线。 |
-| `/ORT changeMode` | Admin | 在 `training`、`match`、`admin` 之间切换比赛模式。 |
-| `/ORT stat` | 无 | 进行成统。 |
+| `/ORT changeMode` | Admin | 在 `training`、`match`、`admin` 之间切换比赛模式；游戏内和控制台均可。 |
+| `/ORT stat` | 无 | 进行成统；游戏内和服务端控制台均可执行。 |
 | `/ORT sketch` | SP | 扫描地图；仅单人且当前没有加载比赛时可用。 |
-| `/ORT stuck` | 比赛中 | 卡住时随机传送，罚时 5 分钟并记录一次死亡。 |
+| `/ORT stuck` | 已加载比赛 | 卡住时随机传送到附近地表；比赛进行中按 `deathpenalty` 记录一次死亡扣时，不在赛中仅提示 `Teleporting...`。 |
+| `/ORT back` | 比赛中 | 传送到最近一次打卡的检查点；尚未打卡时传送到实际开赛位置（没有记录时回退赛事中心）。按 `backpenalty` 扣时并计入最终成绩。 |
+
+可在服务端控制台执行的指令：`generate`、`loadMatch`、`openMatch`、`closeMatch`、`clearPlayers`、`changeMode`、`stat`。其余指令需要以玩家身份执行。
 
 ### Tab 补全
 
 `/ORT` 支持 Tab 补全：
 
-- 第一层补全全部子命令。
+- 第一层：游戏内补全全部子命令；服务端控制台只补全可在控制台执行的子命令。
+- 补全不区分大小写，候选按字母排序。
 - `/ORT loadMatch <Tab>` 补全 `.orienteering` 中已有 `match` 文件的比赛名。
 - `/ORT generate <Tab>` 补全已有 `matchseed.json` 的比赛名。
 - `/ORT changeCourse <Tab>` 补全当前比赛的路线名。
@@ -228,7 +234,8 @@
 - 接力/团队赛会把同组队友的成绩合并；未完成的队友会被跳过。
 - 服务器比赛完成后执行 `/ORT stat`，在比赛目录生成：
   - `0_stat.txt`：总成绩，可用 Excel 打开。
-  - `1_statdetail.txt`：每个检查点的明细。
+  - `1_statdetail.txt`：每个检查点的明细；文件末尾的 `# Back records` 段记录 `/ORT back` 的比赛时间点、目标点号或 START/SPAWN、目标坐标和传送前坐标。
+- 每名玩家的成绩条文件也会列出 back 使用记录。
 - 成统明细写入 `1_statdetail.txt`；读取玩家数据出错时，错误写入服务器日志。
 - 线下比赛需要手动收集 `.orienteering/<比赛名>/players/<玩家 ID>` 数据。
 

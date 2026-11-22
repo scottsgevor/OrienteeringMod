@@ -191,6 +191,7 @@ implements IMessage {
                         }
                         player.func_180473_a(new BlockPos(instance.match.spawn[0], instance.match.spawn[1], instance.match.spawn[2]), true);
                         p.start(world.func_82737_E());
+                        p.recordStartPosition(player.field_70165_t, player.field_70163_u, player.field_70161_v);
                         LogManager.getLogger().info("" + player.func_70005_c_() + " starts at time " + world.func_82737_E() + ". Course: " + course.getName() + ".");
                         OrienteeringMod.NETHANDLER.sendTo(MsgMatchClient.CreateNewMsg(instance, player.func_70005_c_()), player);
                         Util.sendMessage(player, "# Player: " + player.func_70005_c_() + ". Course: " + course.getName() + ". Type: " + course.getCourseType().toString());
@@ -214,7 +215,8 @@ implements IMessage {
                         if (!p.isInMatchProgress()) {
                             return new MsgResponse(player, true, false, false, "(You are not in a match.)");
                         }
-                        p.checkpoint(message.getCPCode(), player.func_71121_q().func_82737_E());
+                        p.checkpoint(message.getCPCode(), player.func_71121_q().func_82737_E(),
+                                player.field_70165_t, player.field_70163_u, player.field_70161_v);
                         LogManager.getLogger().info("" + player.func_70005_c_() + " clicks checkpoint " + message.getCPCode() + " at time " + player.func_71121_q().func_82737_E());
                         return new MsgResponse(player, false, false, false, " ");
                     }

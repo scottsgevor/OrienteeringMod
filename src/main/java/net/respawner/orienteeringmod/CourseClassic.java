@@ -64,7 +64,7 @@ extends CourseBasic {
             }
             if (correctCPNumber > this.CPList.size()) break;
         }
-        if ((totalTimeWithPenalty = (totalTime = (player.getLastCPTime() - player.getBeginningTime()) / 2L) + (long)(player.getDeathCount() * this.deathPenalty * 600)) > (long)(this.validTime * 600)) {
+        if ((totalTimeWithPenalty = (totalTime = (player.getLastCPTime() - player.getBeginningTime()) / 2L) + (long)(player.getDeathCount() * this.deathPenalty * 600) + player.getExtraTimePenalty()) > (long)(this.validTime * 600)) {
             isQualified = false;
         }
         if (correctCPNumber < this.CPList.size() + 1) {
