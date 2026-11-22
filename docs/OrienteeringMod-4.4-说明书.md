@@ -210,7 +210,8 @@
 
 `/ORT` 支持 Tab 补全：
 
-- 第一层补全全部子命令。
+- 第一层：游戏内补全全部子命令；服务端控制台只补全可在控制台执行的子命令。
+- 补全不区分大小写，候选按字母排序。
 - `/ORT loadMatch <Tab>` 补全 `.orienteering` 中已有 `match` 文件的比赛名。
 - `/ORT generate <Tab>` 补全已有 `matchseed.json` 的比赛名。
 - `/ORT changeCourse <Tab>` 补全当前比赛的路线名。

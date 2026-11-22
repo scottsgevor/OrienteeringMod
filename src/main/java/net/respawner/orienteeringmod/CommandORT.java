@@ -5,6 +5,7 @@ package net.respawner.orienteeringmod;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -58,40 +59,52 @@ extends CommandBase {
     public List<String> func_184883_a(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
         if (!(sender instanceof EntityPlayerMP)) {
             if (args.length == 1) {
-                return func_71530_a(args, "generate", "loadMatch", "openMatch", "closeMatch",
-                        "clearPlayers", "changeMode", "stat");
+                return CommandORT.complete(args, Arrays.asList("generate", "loadMatch", "openMatch",
+                        "closeMatch", "clearPlayers", "changeMode", "stat"));
             }
             if (args.length == 2) {
                 String sub = args[0].toLowerCase(Locale.ROOT);
-                if ("loadMatch".equals(sub)) {
-                    return func_175762_a(args, matchNames(Util.STR_MATCH_FILE));
+                if ("loadmatch".equals(sub)) {
+                    return CommandORT.complete(args, matchNames(Util.STR_MATCH_FILE));
                 }
                 if ("generate".equals(sub)) {
-                    return func_175762_a(args, matchNames("matchseed.json"));
+                    return CommandORT.complete(args, matchNames("matchseed.json"));
                 }
             }
             return Collections.emptyList();
         }
         if (args.length == 1) {
-            return func_71530_a(args, "generate", "loadMatch", "openMatch", "closeMatch",
-                    "home", "clearPlayers", "getCourse", "changeCourse", "changeMode",
-                    "stat", "sketch", "stuck", "back");
+            List<String> commands = new ArrayList<String>(Arrays.asList("generate", "loadMatch",
+                    "openMatch", "closeMatch", "home", "clearPlayers", "getCourse", "changeCourse",
+                    "changeMode", "stat", "sketch", "stuck", "back"));
+            return CommandORT.complete(args, commands);
         }
         if (args.length == 2) {
             String sub = args[0].toLowerCase(Locale.ROOT);
-            if ("loadMatch".equals(sub)) {
-                return func_175762_a(args, matchNames(Util.STR_MATCH_FILE));
+            if ("loadmatch".equals(sub)) {
+                return CommandORT.complete(args, matchNames(Util.STR_MATCH_FILE));
             }
             if ("generate".equals(sub)) {
-                return func_175762_a(args, matchNames("matchseed.json"));
+                return CommandORT.complete(args, matchNames("matchseed.json"));
             }
-            if ("changeCourse".equals(sub) && ORTWorld.hasMatchServer()) {
+            if ("changecourse".equals(sub) && ORTWorld.hasMatchServer()) {
                 List<String> courses = new ArrayList<String>(ORTWorld.getMatchInstanceServer().match.getCourseList());
-                Collections.sort(courses);
-                return func_175762_a(args, courses);
+                return CommandORT.complete(args, courses);
             }
         }
         return Collections.emptyList();
+    }
+
+    private static List<String> complete(String[] args, List<String> candidates) {
+        String prefix = args[args.length - 1].toLowerCase(Locale.ROOT);
+        List<String> result = new ArrayList<String>();
+        for (String candidate : candidates) {
+            if (candidate.toLowerCase(Locale.ROOT).startsWith(prefix)) {
+                result.add(candidate);
+            }
+        }
+        Collections.sort(result);
+        return result;
     }
 
     private static List<String> matchNames(String requiredFile) {
