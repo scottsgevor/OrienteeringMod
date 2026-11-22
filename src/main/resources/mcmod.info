@@ -3,7 +3,7 @@
   "modid": "orienteeringmod",
   "name": "Orienteering Mod",
   "description": "This mod helps you organize and run orienteering in Minecraft by establishing a checkpoint and scoring system.",
-  "version": "4.4",
+  "version": "4.5",
   "mcversion": "Forge 1.12.2-14.23.5.2836",
   "url": "",
   "updateUrl": "",

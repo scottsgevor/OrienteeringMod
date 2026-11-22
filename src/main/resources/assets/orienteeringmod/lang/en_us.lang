@@ -1,5 +1,6 @@
 item.orienteeringmod.itemortshovel.name=Orienteering Shovel
 item.orienteeringmod.itemorttimeconverter.name=Time Converter
+item.orienteeringmod.mapimage.name=Map Image
 tile.orienteeringmod.blockcourseswitch.name=Course Switch
 tile.orienteeringmod.blockcheckpoint.name=Checkpoint
 tile.orienteeringmod.blockcpstart.name=Start Point
