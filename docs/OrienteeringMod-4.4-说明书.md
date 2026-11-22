@@ -103,9 +103,9 @@
 | `nightvision` | boolean | 是否给予夜视效果。 |
 | `customfalldamage` | boolean | 是否使用 ORT 特殊摔落规则，默认 `true`，详见 3.4。 |
 | `spawn` | int[3] | 赛事中心的 `[x, y, z]`，完成比赛或死亡后回到这里。 |
-| `admin` | string[] | 管理员名单。管理员拥有命令权限和 F3 等权限。 |
+| `admin` | string[] | 管理员名单。列出的玩家拥有 ORT 管理权限；在线原版 OP 也视为 ORT 管理员。ORT 管理员不会自动获得原版 OP。 |
 | `spectator` | string[] | 旁观者名单，进入后为旁观模式。不能与管理员名单重合。 |
-| `worldmode` | string | `training`、`match`、`admin`。`training` 可反复开始；`match` 每名玩家只能开始一次；`admin` 下所有人都是管理员。 |
+| `worldmode` | string | `training`、`match`、`admin`。`training` 可反复开始；`match` 每名玩家只能开始一次；`admin` 下所有人都是 ORT 管理员（不会自动授予原版 OP）。 |
 | `courses` | object[] | 路线列表，见 3.2。 |
 
 

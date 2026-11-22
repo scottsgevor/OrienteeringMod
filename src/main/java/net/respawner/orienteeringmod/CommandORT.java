@@ -469,6 +469,7 @@ extends CommandBase {
                 }
                 if (!ORTWorld.getMatchInstanceServer().match.isAdmin(player.func_70005_c_())) {
                     Util.sendMessage(player, "Only admin can use this command.");
+                    return;
                 }
                 Util.sendMessage(player, "Success: " + ORTWorld.getMatchInstanceServer().match.changeMode());
             }

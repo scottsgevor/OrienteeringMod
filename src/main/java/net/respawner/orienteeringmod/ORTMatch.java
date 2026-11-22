@@ -16,6 +16,9 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.respawner.orienteeringmod.IPlayerGroup;
 import net.respawner.orienteeringmod.IllegalSourceException;
 import net.respawner.orienteeringmod.ORTFileException;
@@ -210,18 +213,22 @@ implements Serializable {
 
     @Nonnull
     public String changeMode() {
+        WorldMode previous = this.wMode;
         switch (this.wMode) {
             case Training: {
                 this.wMode = WorldMode.Match;
-                return this.wMode.toString() + "->" + WorldMode.Match.toString();
+                break;
             }
             case Match: {
                 this.wMode = WorldMode.Admin;
-                return this.wMode.toString() + "->" + WorldMode.Admin.toString();
+                break;
+            }
+            default: {
+                this.wMode = WorldMode.Training;
+                break;
             }
         }
-        this.wMode = WorldMode.Training;
-        return this.wMode.toString() + "->" + WorldMode.Training.toString();
+        return previous.toString() + "->" + this.wMode.toString();
     }
 
     public void checkRuleBeforeStarting(ORTPlayer player, ORTWorld instance) throws ORTIngameException {
@@ -348,14 +355,27 @@ implements Serializable {
     }
 
     public boolean isAdmin(String playerName) {
-        boolean a = false;
-        if (playerName.equals("Respawner__")) {
-            return true;
-        }
         if (this.wMode == WorldMode.Admin) {
             return true;
         }
-        return this.admins.contains(playerName);
+        if (this.admins.contains(playerName)) {
+            return true;
+        }
+        return ORTMatch.isServerOp(playerName);
+    }
+
+    private static boolean isServerOp(String playerName) {
+        try {
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            if (server == null) {
+                return false;
+            }
+            EntityPlayerMP player = server.func_184103_al().func_152612_a(playerName);
+            return player != null && server.func_184103_al().func_152596_g(player.func_146103_bH());
+        }
+        catch (Throwable e) {
+            return false;
+        }
     }
 
     public boolean isSpectator(String playerName) {

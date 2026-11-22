@@ -4,7 +4,6 @@
 package net.respawner.orienteeringmod;
 
 import java.io.File;
-import java.util.Arrays;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
@@ -362,9 +361,6 @@ public class OrienteeringMod {
                         Util.sendMessage(player, "The system detected that you are flying. You are dead now.");
                         player.func_70097_a(DamageSource.field_76380_i, Float.MAX_VALUE);
                     }
-                } else if (!Arrays.asList(player.func_184102_h().func_184103_al().func_152606_n()).contains(player.func_70005_c_())) {
-                    player.func_184102_h().func_184103_al().func_152605_a(player.func_146103_bH());
-                    Util.sendMessage(player, "Detected that you are admin.");
                 }
                 if ((p = ORTWorld.getMatchInstanceServer().players.get(player.func_70005_c_())) == null) {
                     return;
