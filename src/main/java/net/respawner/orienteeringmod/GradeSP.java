@@ -158,7 +158,7 @@ implements IGrade {
 
     @Override
     public String getGeneralGradeString() {
-        return this.matchName + "\t" + this.type() + "\t" + this.courseName + "\t" + this.playerName + "\t" + Util.timeTranslation(this.totalTime) + "\t" + this.deathCount + "\t" + Util.timeTranslation(this.totalTimeWithPenalty) + "\t" + (this.isQualified ? "T" : "F");
+        return this.matchName + "\t" + this.type() + "\t" + this.courseName + "\t" + this.playerName + "\t" + Util.timeTranslation(this.totalTime) + "\t" + this.deathCount + "\t" + this.backRecordsView().size() + "\t" + Util.timeTranslation(this.totalTimeWithPenalty) + "\t" + (this.isQualified ? "T" : "F");
     }
 
     protected abstract String type();
