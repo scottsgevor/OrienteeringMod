@@ -15,6 +15,11 @@ public final class MapImageClientSetup {
     private MapImageClientSetup() {
     }
 
+    public static void registerKeyBindings() {
+        MapImageKeyBindings.register();
+        CompassKeyBindings.register();
+    }
+
     @SubscribeEvent
     public static void registerModel(ModelRegistryEvent event) {
         MapImageClientCache.ensureNetworkRegistered();

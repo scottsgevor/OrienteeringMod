@@ -192,12 +192,6 @@ implements IMessage {
                         player.func_180473_a(new BlockPos(instance.match.spawn[0], instance.match.spawn[1], instance.match.spawn[2]), true);
                         p.start(world.func_82737_E());
                         p.recordStartPosition(player.field_70165_t, player.field_70163_u, player.field_70161_v);
-                        try {
-                            MapImageService.giveMaps(player, instance.matchName, course.getName());
-                        }
-                        catch (Throwable e) {
-                            LogManager.getLogger().warn("Failed to give map images to " + player.func_70005_c_() + ": " + e.getMessage());
-                        }
                         LogManager.getLogger().info("" + player.func_70005_c_() + " starts at time " + world.func_82737_E() + ". Course: " + course.getName() + ".");
                         OrienteeringMod.NETHANDLER.sendTo(MsgMatchClient.CreateNewMsg(instance, player.func_70005_c_()), player);
                         Util.sendMessage(player, "# Player: " + player.func_70005_c_() + ". Course: " + course.getName() + ". Type: " + course.getCourseType().toString());

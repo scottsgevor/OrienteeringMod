@@ -2,6 +2,7 @@ package net.respawner.orienteeringmod;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.BufferUtils;
@@ -10,26 +11,26 @@ import org.lwjgl.util.glu.GLU;
 
 @SideOnly(Side.CLIENT)
 public final class MapImageProjection {
-    private static final float[] SCREEN_X = new float[4];
-    private static final float[] SCREEN_Y = new float[4];
+    private static final Snapshot MAIN = new Snapshot();
+    private static final Snapshot OFF = new Snapshot();
     private static final FloatBuffer MODELVIEW = BufferUtils.createFloatBuffer(16);
     private static final FloatBuffer PROJECTION = BufferUtils.createFloatBuffer(16);
     private static final IntBuffer VIEWPORT = BufferUtils.createIntBuffer(16);
     private static final FloatBuffer PROJECTED = BufferUtils.createFloatBuffer(3);
-    private static MapImageRef ref;
-    private static boolean valid;
 
     private MapImageProjection() {
     }
 
     public static void update(MapImageRef imageRef, float left, float top, float right, float bottom, float z) {
-        if (!MapInspectionController.isActive()) {
+        update(imageRef, left, top, right, bottom, z, EnumHand.MAIN_HAND);
+    }
+
+    public static void update(MapImageRef imageRef, float left, float top, float right, float bottom, float z, EnumHand hand) {
+        if (!MapInspectionController.isActive() || imageRef == null) {
             return;
         }
-        MapImageRef active = MapInspectionController.getRef();
-        if (active == null || imageRef == null
-                || !active.getMatch().equals(imageRef.getMatch())
-                || !active.getImage().equals(imageRef.getImage())) {
+        Snapshot snapshot = snapshot(hand);
+        if (snapshot == null) {
             return;
         }
         MODELVIEW.clear();
@@ -38,21 +39,22 @@ public final class MapImageProjection {
         GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, MODELVIEW);
         GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, PROJECTION);
         GL11.glGetInteger(GL11.GL_VIEWPORT, VIEWPORT);
-        if (project(left, top, z, 0) & project(right, top, z, 1)
-                & project(right, bottom, z, 2) & project(left, bottom, z, 3)) {
-            ref = imageRef;
-            valid = true;
+        if (project(snapshot, left, top, z, 0) & project(snapshot, right, top, z, 1)
+                & project(snapshot, right, bottom, z, 2) & project(snapshot, left, bottom, z, 3)) {
+            snapshot.ref = imageRef;
+            snapshot.valid = true;
         }
         else {
-            valid = false;
+            snapshot.valid = false;
         }
     }
 
-    public static float[] cursorLocal(float mouseX, float mouseY) {
-        if (!valid || ref == null || !MapInspectionController.isActive()) {
-            return new float[] { 0.5f, 0.5f };
+    public static float[] local(EnumHand hand, MapImageRef wanted, float mouseX, float mouseY) {
+        Snapshot snapshot = snapshot(hand);
+        if (!matches(snapshot, wanted) || !MapInspectionController.isActive()) {
+            return null;
         }
-        float[] first = triangle(mouseX, mouseY, 0, 1, 2);
+        float[] first = triangle(snapshot, mouseX, mouseY, 0, 1, 2);
         if (first != null) {
             float w0 = first[0];
             float w1 = first[1];
@@ -61,7 +63,7 @@ public final class MapImageProjection {
             float s = base > 0.00001f ? w1 / base : 0.5f;
             return new float[] { clamp01(s), clamp01(w2) };
         }
-        float[] second = triangle(mouseX, mouseY, 0, 2, 3);
+        float[] second = triangle(snapshot, mouseX, mouseY, 0, 2, 3);
         if (second != null) {
             float w0 = second[0];
             float w2 = second[1];
@@ -70,30 +72,58 @@ public final class MapImageProjection {
             float s = base > 0.00001f ? w2 / base : 0.5f;
             return new float[] { clamp01(s), clamp01(w2 + w3) };
         }
-        return new float[] { 0.5f, 0.5f };
+        return null;
+    }
+
+    public static float centerDistanceSq(EnumHand hand, MapImageRef wanted, float mouseX, float mouseY) {
+        Snapshot snapshot = snapshot(hand);
+        if (!matches(snapshot, wanted) || !MapInspectionController.isActive()) {
+            return Float.MAX_VALUE;
+        }
+        float centerX = (snapshot.x[0] + snapshot.x[1] + snapshot.x[2] + snapshot.x[3]) / 4.0f;
+        float centerY = (snapshot.y[0] + snapshot.y[1] + snapshot.y[2] + snapshot.y[3]) / 4.0f;
+        float dx = mouseX - centerX;
+        float dy = mouseY - centerY;
+        return dx * dx + dy * dy;
     }
 
     public static void clear() {
-        ref = null;
-        valid = false;
+        MAIN.clear();
+        OFF.clear();
     }
 
-    private static boolean project(float x, float y, float z, int index) {
+    private static Snapshot snapshot(EnumHand hand) {
+        if (hand == EnumHand.MAIN_HAND) {
+            return MAIN;
+        }
+        if (hand == EnumHand.OFF_HAND) {
+            return OFF;
+        }
+        return null;
+    }
+
+    private static boolean matches(Snapshot snapshot, MapImageRef wanted) {
+        return snapshot != null && snapshot.valid && snapshot.ref != null && wanted != null
+                && snapshot.ref.getMatch().equals(wanted.getMatch())
+                && snapshot.ref.getImage().equals(wanted.getImage());
+    }
+
+    private static boolean project(Snapshot snapshot, float x, float y, float z, int index) {
         if (!GLU.gluProject(x, y, z, MODELVIEW, PROJECTION, VIEWPORT, PROJECTED)) {
             return false;
         }
-        SCREEN_X[index] = PROJECTED.get(0);
-        SCREEN_Y[index] = PROJECTED.get(1);
+        snapshot.x[index] = PROJECTED.get(0);
+        snapshot.y[index] = PROJECTED.get(1);
         return true;
     }
 
-    private static float[] triangle(float px, float py, int a, int b, int c) {
-        float ax = SCREEN_X[a];
-        float ay = SCREEN_Y[a];
-        float bx = SCREEN_X[b];
-        float by = SCREEN_Y[b];
-        float cx = SCREEN_X[c];
-        float cy = SCREEN_Y[c];
+    private static float[] triangle(Snapshot snapshot, float px, float py, int a, int b, int c) {
+        float ax = snapshot.x[a];
+        float ay = snapshot.y[a];
+        float bx = snapshot.x[b];
+        float by = snapshot.y[b];
+        float cx = snapshot.x[c];
+        float cy = snapshot.y[c];
         float det = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
         if (Math.abs(det) < 0.00001f) {
             return null;
@@ -109,5 +139,17 @@ public final class MapImageProjection {
 
     private static float clamp01(float value) {
         return Math.max(0.0f, Math.min(1.0f, value));
+    }
+
+    private static final class Snapshot {
+        final float[] x = new float[4];
+        final float[] y = new float[4];
+        MapImageRef ref;
+        boolean valid;
+
+        void clear() {
+            ref = null;
+            valid = false;
+        }
     }
 }

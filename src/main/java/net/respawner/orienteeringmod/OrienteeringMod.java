@@ -66,11 +66,11 @@ import net.respawner.orienteeringmod.Track;
 import net.respawner.orienteeringmod.Util;
 import org.apache.logging.log4j.LogManager;
 
-@Mod(modid="orienteeringmod", name="Orienteering Mod", version="4.5", acceptedMinecraftVersions="[1.12.2]")
+@Mod(modid="orienteeringmod", name="Orienteering Mod", version="4.7", acceptedMinecraftVersions="[1.12.2]")
 public class OrienteeringMod {
     public static final String MODID = "orienteeringmod";
     public static final String NAME = "Orienteering Mod";
-    public static final String VERSION = "4.5";
+    public static final String VERSION = "4.7";
     public static final long SerialVersion = 4L;
     public static final int MatchseedVersion = 4;
     public static final SimpleNetworkWrapper NETHANDLER = NetworkRegistry.INSTANCE.newSimpleChannel("orienteeringmod");
@@ -79,6 +79,15 @@ public class OrienteeringMod {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        if (FMLCommonHandler.instance().getSide().isClient()) {
+            try {
+                Class<?> setup = Class.forName("net.respawner.orienteeringmod.MapImageClientSetup");
+                setup.getMethod("registerKeyBindings").invoke(null);
+            }
+            catch (Throwable e) {
+                LogManager.getLogger().warn("Failed to register map image key bindings: " + e.getMessage());
+            }
+        }
     }
 
     @Mod.EventHandler
@@ -174,8 +183,8 @@ public class OrienteeringMod {
             Minecraft mc = Minecraft.func_71410_x();
             GuiIngame gui = mc.field_71456_v;
             if (instance.decodeStatus() == ORTPlayer.PlayerStatus.InProgress) {
-                if (instance.needDrawCompass()) {
-                    Drawing.drawCompass(mc, gui);
+                if (instance.needDrawCompass() && CompassClientState.isVisible()) {
+                    Drawing.drawCompass(mc, gui, CompassClientState.positionIndex());
                 }
                 if (instance.displayTime()) {
                     Drawing.drawTimeString(mc, gui, startTime, timePenalty);
@@ -392,6 +401,7 @@ public class OrienteeringMod {
         static BlockCPStart CPStart = new BlockCPStart();
         static BlockCPEnd CPEnd = new BlockCPEnd();
         static BlockMainStation mainStation = new BlockMainStation();
+        static BlockMapDispenser mapDispenser = new BlockMapDispenser();
         static ItemORTShovel ORTShovel = new ItemORTShovel();
         static ItemORTTimeConverter ORTTimeConverter = new ItemORTTimeConverter();
         static ItemMapImage mapImage = new ItemMapImage();
@@ -402,6 +412,7 @@ public class OrienteeringMod {
             event.getRegistry().register((Block)CPStart.setRegistryName(OrienteeringMod.MODID, "cpstart"));
             event.getRegistry().register((Block)CPEnd.setRegistryName(OrienteeringMod.MODID, "cpend"));
             event.getRegistry().register((Block)mainStation.setRegistryName(OrienteeringMod.MODID, "mainstation"));
+            event.getRegistry().register((Block)mapDispenser.setRegistryName(OrienteeringMod.MODID, "mapdispenser"));
             GameRegistry.registerTileEntity(TileEntityCheckpoint.class, new ResourceLocation(OrienteeringMod.MODID, "checkpoint"));
         }
 
@@ -411,6 +422,7 @@ public class OrienteeringMod {
             event.getRegistry().register((Item)new ItemBlock(CPStart).setRegistryName(OrienteeringMod.MODID, "cpstart"));
             event.getRegistry().register((Item)new ItemBlock(CPEnd).setRegistryName(OrienteeringMod.MODID, "cpend"));
             event.getRegistry().register((Item)new ItemBlock(mainStation).setRegistryName(OrienteeringMod.MODID, "mainstation"));
+            event.getRegistry().register((Item)new ItemBlock(mapDispenser).setRegistryName(OrienteeringMod.MODID, "mapdispenser"));
             event.getRegistry().register((Item)ORTShovel.setRegistryName(OrienteeringMod.MODID, "ortshovel"));
             event.getRegistry().register((Item)ORTTimeConverter.setRegistryName(OrienteeringMod.MODID, "orttimeconverter"));
             event.getRegistry().register((Item)mapImage.setRegistryName(OrienteeringMod.MODID, "mapimage"));
@@ -424,6 +436,7 @@ public class OrienteeringMod {
             ModelLoader.setCustomModelResourceLocation(Item.func_150898_a(CPStart), 0, new ModelResourceLocation(new ResourceLocation(OrienteeringMod.MODID, "cpstart"), "inventory"));
             ModelLoader.setCustomModelResourceLocation(Item.func_150898_a(CPEnd), 0, new ModelResourceLocation(new ResourceLocation(OrienteeringMod.MODID, "cpend"), "inventory"));
             ModelLoader.setCustomModelResourceLocation(Item.func_150898_a(mainStation), 0, new ModelResourceLocation(new ResourceLocation(OrienteeringMod.MODID, "mainstation"), "inventory"));
+            ModelLoader.setCustomModelResourceLocation(Item.func_150898_a(mapDispenser), 0, new ModelResourceLocation(new ResourceLocation(OrienteeringMod.MODID, "mapdispenser"), "inventory"));
         }
     }
 }

@@ -38,6 +38,29 @@ public final class MapImageHands {
         return MapImageRef.fromStack(player.func_184586_b(EnumHand.OFF_HAND));
     }
 
+    public static EnumHand primaryHand(EntityPlayer player) {
+        if (player == null) {
+            return null;
+        }
+        if (MapImageRef.fromStack(player.func_184586_b(EnumHand.MAIN_HAND)) != null) {
+            return EnumHand.MAIN_HAND;
+        }
+        if (MapImageRef.fromStack(player.func_184586_b(EnumHand.OFF_HAND)) != null) {
+            return EnumHand.OFF_HAND;
+        }
+        return null;
+    }
+
+    public static boolean handHolds(EntityPlayer player, EnumHand hand, MapImageRef wanted) {
+        if (player == null || hand == null || wanted == null) {
+            return false;
+        }
+        MapImageRef ref = MapImageRef.fromStack(player.func_184586_b(hand));
+        return ref != null
+                && ref.getMatch().equals(wanted.getMatch())
+                && ref.getImage().equals(wanted.getImage());
+    }
+
     public static MapImageRef primaryTwoHanded(EntityPlayer player) {
         if (player == null) {
             return null;

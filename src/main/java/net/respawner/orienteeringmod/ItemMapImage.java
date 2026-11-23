@@ -16,6 +16,6 @@ public class ItemMapImage extends Item {
     @Override
     public void func_77624_a(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
         tooltip.add("J/K: rotate 90 degrees");
-        tooltip.add("H (two-handed pose): release mouse to zoom the held map");
+        tooltip.add("H: release mouse to zoom the held map");
     }
 }

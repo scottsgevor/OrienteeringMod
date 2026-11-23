@@ -1,0 +1,12 @@
+{
+    "parent": "block/cube",
+    "textures": {
+        "particle": "orienteeringmod:blocks/cartography_table_side3",
+        "down": "blocks/dark_oak_planks",
+        "up": "orienteeringmod:blocks/cartography_table_top",
+        "north": "orienteeringmod:blocks/cartography_table_side3",
+        "east": "orienteeringmod:blocks/cartography_table_side3",
+        "south": "orienteeringmod:blocks/cartography_table_side1",
+        "west": "orienteeringmod:blocks/cartography_table_side2"
+    }
+}

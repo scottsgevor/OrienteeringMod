@@ -26,11 +26,13 @@ public final class MapImageInputHandler {
             return;
         }
         int key = Keyboard.getEventKey();
-        if (key == Keyboard.KEY_H) {
+        if (MapImageKeyBindings.INSPECT.isActiveAndMatches(key)) {
             MapInspectionController.toggle(mc);
-        } else if (key == Keyboard.KEY_J) {
+        }
+        else if (MapImageKeyBindings.ROTATE_LEFT.isActiveAndMatches(key)) {
             MapInspectionController.rotateHeld(mc, -90);
-        } else if (key == Keyboard.KEY_K) {
+        }
+        else if (MapImageKeyBindings.ROTATE_RIGHT.isActiveAndMatches(key)) {
             MapInspectionController.rotateHeld(mc, 90);
         }
     }
