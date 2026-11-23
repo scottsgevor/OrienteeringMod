@@ -6,6 +6,7 @@ tile.orienteeringmod.blockcheckpoint.name=Checkpoint
 tile.orienteeringmod.blockcpstart.name=Start Point
 tile.orienteeringmod.blockcpend.name=End Point
 tile.orienteeringmod.blockmainstation.name=Main Station
+tile.orienteeringmod.mapdispenser.name=Map Dispenser
 itemGroup.orienteering=Orienteering
 key.categories.orienteeringmod=OrienteeringMod
 key.orienteeringmod.rotate_left=Rotate Map Left
