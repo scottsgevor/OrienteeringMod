@@ -30,7 +30,7 @@ def main():
     if not all((CACHE / n).is_file() for n in ("forge-srg.jar", "ecj.jar", "jsr305.jar")):
         subprocess.run([sys.executable, str(ROOT / "prepare.py")], check=True)
     cp = os.pathsep.join(map(str, [CACHE / "forge-srg.jar", CACHE / "jsr305.jar", *game_libraries(profile)]))
-    dest = ROOT / "build/OrienteeringMod-4.4.jar"
+    dest = ROOT / "build/OrienteeringMod-4.5.jar"
     dest.parent.mkdir(exist_ok=True)
     with tempfile.TemporaryDirectory(dir=dest.parent) as folder:
         classes = Path(folder) / "classes"

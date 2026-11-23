@@ -450,6 +450,12 @@ extends CommandBase {
                     return;
                 }
                 ORTWorld.getMatchInstanceServer().match.changeCourse(player.func_70005_c_(), args[1]);
+                try {
+                    MapImageService.giveMaps(player, ORTWorld.getMatchInstanceServer().matchName, args[1]);
+                }
+                catch (Throwable e) {
+                    LogManager.getLogger().warn("Failed to give map images to " + player.func_70005_c_() + ": " + e.getMessage());
+                }
                 Util.sendMessage(player, "Success.");
             }
             catch (ORTIngameException e) {

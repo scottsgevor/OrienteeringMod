@@ -29,6 +29,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -65,11 +66,11 @@ import net.respawner.orienteeringmod.Track;
 import net.respawner.orienteeringmod.Util;
 import org.apache.logging.log4j.LogManager;
 
-@Mod(modid="orienteeringmod", name="Orienteering Mod", version="4.4", acceptedMinecraftVersions="[1.12.2]")
+@Mod(modid="orienteeringmod", name="Orienteering Mod", version="4.5", acceptedMinecraftVersions="[1.12.2]")
 public class OrienteeringMod {
     public static final String MODID = "orienteeringmod";
     public static final String NAME = "Orienteering Mod";
-    public static final String VERSION = "4.4";
+    public static final String VERSION = "4.5";
     public static final long SerialVersion = 4L;
     public static final int MatchseedVersion = 4;
     public static final SimpleNetworkWrapper NETHANDLER = NetworkRegistry.INSTANCE.newSimpleChannel("orienteeringmod");
@@ -89,6 +90,10 @@ public class OrienteeringMod {
         NETHANDLER.registerMessage(MsgGradeRequest.MsgResponse.MsgResponseHandler.class, MsgGradeRequest.MsgResponse.class, 5, Side.CLIENT);
         NETHANDLER.registerMessage(MsgSetCP.MsgSetCPHandler.class, MsgSetCP.class, 6, Side.SERVER);
         NETHANDLER.registerMessage(MsgTimePenalty.MsgTPHandler.class, MsgTimePenalty.class, 7, Side.CLIENT);
+        NETHANDLER.registerMessage(MsgMapImageRequest.MsgMIRHandler.class, MsgMapImageRequest.class, 8, Side.SERVER);
+        if (FMLCommonHandler.instance().getSide().isServer()) {
+            NETHANDLER.registerMessage(MsgMapImageData.ServerNoopHandler.class, MsgMapImageData.class, 9, Side.CLIENT);
+        }
         File rootPath = new File(Util.getRootPath());
         try {
             if (!rootPath.isDirectory()) {
@@ -389,6 +394,7 @@ public class OrienteeringMod {
         static BlockMainStation mainStation = new BlockMainStation();
         static ItemORTShovel ORTShovel = new ItemORTShovel();
         static ItemORTTimeConverter ORTTimeConverter = new ItemORTTimeConverter();
+        static ItemMapImage mapImage = new ItemMapImage();
 
         @SubscribeEvent
         public static void registerBlock(RegistryEvent.Register<Block> event) {
@@ -407,6 +413,7 @@ public class OrienteeringMod {
             event.getRegistry().register((Item)new ItemBlock(mainStation).setRegistryName(OrienteeringMod.MODID, "mainstation"));
             event.getRegistry().register((Item)ORTShovel.setRegistryName(OrienteeringMod.MODID, "ortshovel"));
             event.getRegistry().register((Item)ORTTimeConverter.setRegistryName(OrienteeringMod.MODID, "orttimeconverter"));
+            event.getRegistry().register((Item)mapImage.setRegistryName(OrienteeringMod.MODID, "mapimage"));
         }
 
         @SubscribeEvent
