@@ -1,6 +1,7 @@
 package net.respawner.orienteeringmod;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
@@ -9,6 +10,7 @@ import org.lwjgl.input.Mouse;
 public final class MapInspectionController {
     private static boolean active;
     private static MapImageRef ref;
+    private static EnumHand inspectionHand;
 
     private MapInspectionController() {
     }
@@ -19,6 +21,10 @@ public final class MapInspectionController {
 
     public static MapImageRef getRef() {
         return ref;
+    }
+
+    public static boolean isInspectionHand(EnumHand hand) {
+        return active && inspectionHand == hand;
     }
 
     public static float getZoom() {
@@ -36,11 +42,13 @@ public final class MapInspectionController {
         if (mc.field_71462_r != null) {
             return;
         }
-        MapImageRef twoHanded = MapImageHands.primaryTwoHanded(mc.field_71439_g);
-        if (twoHanded == null) {
+        MapImageRef target = MapImageHands.primary(mc.field_71439_g);
+        EnumHand hand = MapImageHands.primaryHand(mc.field_71439_g);
+        if (target == null || hand == null) {
             return;
         }
-        ref = twoHanded;
+        ref = target;
+        inspectionHand = hand;
         active = true;
         MapImageProjection.clear();
         MapImageClientCache.retry(ref);
@@ -50,6 +58,7 @@ public final class MapInspectionController {
     public static void close(Minecraft mc) {
         active = false;
         ref = null;
+        inspectionHand = null;
         MapImageProjection.clear();
         if (mc != null && mc.field_71462_r == null) {
             mc.func_71381_h();
@@ -60,6 +69,7 @@ public final class MapInspectionController {
         if (mc == null || mc.field_71439_g == null) {
             active = false;
             ref = null;
+            inspectionHand = null;
             MapImageProjection.clear();
             return;
         }
@@ -72,10 +82,12 @@ public final class MapInspectionController {
         if (mc.field_71441_e == null || mc.field_71462_r != null) {
             active = false;
             ref = null;
+            inspectionHand = null;
             MapImageProjection.clear();
             return;
         }
-        if (ref == null || !MapImageHands.isTwoHanded(mc.field_71439_g, ref)) {
+        if (ref == null || inspectionHand == null
+                || !MapImageHands.handHolds(mc.field_71439_g, inspectionHand, ref)) {
             close(mc);
             return;
         }
