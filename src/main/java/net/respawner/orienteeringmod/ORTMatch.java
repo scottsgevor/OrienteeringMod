@@ -185,7 +185,15 @@ implements Serializable {
     }
 
     public void changeCourse(String playerName, String newCourse) throws ORTIngameException {
-        if (this.useRoster() && !this.isAdmin(playerName)) {
+        this.changeCourseInternal(playerName, newCourse, false);
+    }
+
+    public void changeCourseAsAdmin(String playerName, String newCourse) throws ORTIngameException {
+        this.changeCourseInternal(playerName, newCourse, true);
+    }
+
+    private void changeCourseInternal(String playerName, String newCourse, boolean asAdmin) throws ORTIngameException {
+        if (!asAdmin && this.useRoster() && !this.isAdmin(playerName)) {
             throw new ORTIngameException("Error: in the presence of player roster, you cannot change your course.");
         }
         if (!this.getCourseList().contains(newCourse)) {
