@@ -97,6 +97,6 @@ public final class MapInspectionController {
         }
         float[] local = MapImageProjection.cursorLocal(Mouse.getX(), Mouse.getY());
         double factor = Math.pow(1.2D, (double) wheel / 120.0D);
-        MapImageClientCache.zoomAt(ref, (float) factor, local[0], local[1]);
+        MapImageClientCache.zoomAt(ref, (float) factor, local[0], 1.0f - local[1]);
     }
 }

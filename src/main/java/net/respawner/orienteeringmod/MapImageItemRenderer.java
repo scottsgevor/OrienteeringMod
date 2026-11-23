@@ -66,8 +66,8 @@ public class MapImageItemRenderer extends TileEntityItemStackRenderer {
         boolean offhand = renderingHand == EnumHand.OFF_HAND;
         float uLeft = offhand ? window[2] : window[0];
         float uRight = offhand ? window[0] : window[2];
-        float vTop = offhand ? window[3] : window[1];
-        float vBottom = offhand ? window[1] : window[3];
+        float vTop = window[1];
+        float vBottom = window[3];
         Tessellator tessellator = Tessellator.func_178181_a();
         BufferBuilder buffer = tessellator.func_178180_c();
         buffer.func_181668_a(7, DefaultVertexFormats.field_181707_g);

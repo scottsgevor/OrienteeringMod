@@ -141,10 +141,10 @@ public final class MapImageTwoHandedRenderer {
         MapImageProjection.update(ref, left, top, right, bottom, -0.01f);
         buffer = tessellator.func_178180_c();
         buffer.func_181668_a(7, DefaultVertexFormats.field_181707_g);
-        buffer.func_181662_b(left, top, -0.01).func_187315_a(window[0], window[1]).func_181675_d();
-        buffer.func_181662_b(right, top, -0.01).func_187315_a(window[2], window[1]).func_181675_d();
-        buffer.func_181662_b(right, bottom, -0.01).func_187315_a(window[2], window[3]).func_181675_d();
-        buffer.func_181662_b(left, bottom, -0.01).func_187315_a(window[0], window[3]).func_181675_d();
+        buffer.func_181662_b(left, top, -0.01).func_187315_a(window[0], window[3]).func_181675_d();
+        buffer.func_181662_b(right, top, -0.01).func_187315_a(window[2], window[3]).func_181675_d();
+        buffer.func_181662_b(right, bottom, -0.01).func_187315_a(window[2], window[1]).func_181675_d();
+        buffer.func_181662_b(left, bottom, -0.01).func_187315_a(window[0], window[1]).func_181675_d();
         tessellator.func_78381_a();
         GlStateManager.func_179121_F();
         GlStateManager.func_179121_F();

@@ -338,8 +338,7 @@ public final class MapImageClientCache {
         try {
             graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            graphics.drawImage(source, 0, 0, width, height,
-                    0, source.getHeight(), source.getWidth(), 0, null);
+            graphics.drawImage(source, 0, 0, width, height, null);
         }
         finally {
             graphics.dispose();
