@@ -53,17 +53,22 @@ public final class MapImageService {
         return result;
     }
 
-    public static int giveMaps(EntityPlayerMP player, String matchName) {
+    public static int giveMaps(EntityPlayerMP player, String matchName, String courseName) {
         if (player == null || matchName == null) {
             return 0;
         }
+        int removed = clearMapImages(player);
+        if (courseName == null || courseName.isEmpty()) {
+            syncInventory(player, removed > 0);
+            return 0;
+        }
+        String prefix = courseName.toLowerCase(Locale.ROOT);
         int given = 0;
-        List<File> images = listImageFiles(matchName);
-        for (File file : images) {
-            MapImageRef ref = new MapImageRef(matchName, file.getName());
-            if (hasMap(player, ref)) {
+        for (File file : listImageFiles(matchName)) {
+            if (!file.getName().toLowerCase(Locale.ROOT).startsWith(prefix)) {
                 continue;
             }
+            MapImageRef ref = new MapImageRef(matchName, file.getName());
             ItemStack stack = new ItemStack(OrienteeringMod.ModInit.mapImage);
             NBTTagCompound tag = new NBTTagCompound();
             tag.func_74778_a(MapImageRef.TAG_MATCH, ref.getMatch());
@@ -76,21 +81,29 @@ public final class MapImageService {
             }
             ++given;
         }
+        syncInventory(player, removed > 0 || given > 0);
         if (given > 0) {
             Util.sendMessage(player, "You received " + given + " map image(s).");
         }
         return given;
     }
 
-    private static boolean hasMap(EntityPlayerMP player, MapImageRef wanted) {
+    private static int clearMapImages(EntityPlayerMP player) {
+        int removed = 0;
         for (int i = 0; i < player.field_71071_by.func_70302_i_(); ++i) {
             ItemStack stack = player.field_71071_by.func_70301_a(i);
-            MapImageRef ref = MapImageRef.fromStack(stack);
-            if (ref != null && ref.getMatch().equals(wanted.getMatch()) && ref.getImage().equals(wanted.getImage())) {
-                return true;
+            if (!stack.func_190926_b() && stack.func_77973_b() == OrienteeringMod.ModInit.mapImage) {
+                player.field_71071_by.func_70299_a(i, ItemStack.field_190927_a);
+                ++removed;
             }
         }
-        return false;
+        return removed;
+    }
+
+    private static void syncInventory(EntityPlayerMP player, boolean changed) {
+        if (changed) {
+            player.field_71070_bA.func_75142_b();
+        }
     }
 
     public static void handleRequest(final EntityPlayerMP player, final String matchName, final String imageName) {

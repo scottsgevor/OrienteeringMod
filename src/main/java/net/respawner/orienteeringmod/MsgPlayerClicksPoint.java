@@ -193,7 +193,7 @@ implements IMessage {
                         p.start(world.func_82737_E());
                         p.recordStartPosition(player.field_70165_t, player.field_70163_u, player.field_70161_v);
                         try {
-                            MapImageService.giveMaps(player, instance.matchName);
+                            MapImageService.giveMaps(player, instance.matchName, course.getName());
                         }
                         catch (Throwable e) {
                             LogManager.getLogger().warn("Failed to give map images to " + player.func_70005_c_() + ": " + e.getMessage());
