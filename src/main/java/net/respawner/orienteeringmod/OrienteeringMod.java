@@ -79,6 +79,15 @@ public class OrienteeringMod {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        if (FMLCommonHandler.instance().getSide().isClient()) {
+            try {
+                Class<?> setup = Class.forName("net.respawner.orienteeringmod.MapImageClientSetup");
+                setup.getMethod("registerKeyBindings").invoke(null);
+            }
+            catch (Throwable e) {
+                LogManager.getLogger().warn("Failed to register map image key bindings: " + e.getMessage());
+            }
+        }
     }
 
     @Mod.EventHandler

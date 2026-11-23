@@ -7,3 +7,7 @@ tile.orienteeringmod.blockcpstart.name=Start Point
 tile.orienteeringmod.blockcpend.name=End Point
 tile.orienteeringmod.blockmainstation.name=Main Station
 itemGroup.orienteering=Orienteering
+key.categories.orienteeringmod=OrienteeringMod
+key.orienteeringmod.rotate_left=Rotate Map Left
+key.orienteeringmod.rotate_right=Rotate Map Right
+key.orienteeringmod.inspect=Inspect Held Map
