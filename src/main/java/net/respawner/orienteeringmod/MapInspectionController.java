@@ -1,6 +1,7 @@
 package net.respawner.orienteeringmod;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.EnumHand;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -21,10 +22,6 @@ public final class MapInspectionController {
 
     public static MapImageRef getRef() {
         return ref;
-    }
-
-    public static boolean isInspectionHand(EnumHand hand) {
-        return active && inspectionHand == hand;
     }
 
     public static float getZoom() {
@@ -91,7 +88,9 @@ public final class MapInspectionController {
             close(mc);
             return;
         }
-        MapImageClientCache.ensureRequested(ref);
+        for (MapImageRef held : MapImageHands.held(mc.field_71439_g)) {
+            MapImageClientCache.ensureRequested(held);
+        }
     }
 
     public static void rotateHeld(Minecraft mc, int delta) {
@@ -104,11 +103,62 @@ public final class MapInspectionController {
     }
 
     public static void scroll(Minecraft mc, int wheel) {
-        if (!active || ref == null || wheel == 0) {
+        if (!active || wheel == 0 || mc == null || mc.field_71439_g == null) {
             return;
         }
-        float[] local = MapImageProjection.cursorLocal(Mouse.getX(), Mouse.getY());
+        EntityPlayerSP player = mc.field_71439_g;
+        MapImageRef mainRef = MapImageRef.fromStack(player.func_184586_b(EnumHand.MAIN_HAND));
+        MapImageRef offRef = MapImageRef.fromStack(player.func_184586_b(EnumHand.OFF_HAND));
+        if (mainRef == null && offRef == null) {
+            return;
+        }
+        float mouseX = Mouse.getX();
+        float mouseY = Mouse.getY();
         double factor = Math.pow(1.2D, (double) wheel / 120.0D);
-        MapImageClientCache.zoomAt(ref, (float) factor, local[0], 1.0f - local[1]);
+        float zoomFactor = (float) factor;
+
+        if (mainRef != null && offRef != null) {
+            float[] mainLocal = MapImageProjection.local(EnumHand.MAIN_HAND, mainRef, mouseX, mouseY);
+            float[] offLocal = MapImageProjection.local(EnumHand.OFF_HAND, offRef, mouseX, mouseY);
+            if (mainLocal != null || offLocal != null) {
+                if (mainLocal != null && offLocal != null) {
+                    float mainDistance = MapImageProjection.centerDistanceSq(
+                            EnumHand.MAIN_HAND, mainRef, mouseX, mouseY);
+                    float offDistance = MapImageProjection.centerDistanceSq(
+                            EnumHand.OFF_HAND, offRef, mouseX, mouseY);
+                    if (offDistance < mainDistance) {
+                        MapImageClientCache.zoomAt(offRef, zoomFactor, offLocal[0], 1.0f - offLocal[1]);
+                    }
+                    else {
+                        MapImageClientCache.zoomAt(mainRef, zoomFactor, mainLocal[0], 1.0f - mainLocal[1]);
+                    }
+                }
+                else if (mainLocal != null) {
+                    MapImageClientCache.zoomAt(mainRef, zoomFactor, mainLocal[0], 1.0f - mainLocal[1]);
+                }
+                else {
+                    MapImageClientCache.zoomAt(offRef, zoomFactor, offLocal[0], 1.0f - offLocal[1]);
+                }
+                return;
+            }
+            MapImageClientCache.zoomAt(mainRef, zoomFactor, 0.5f, 0.5f);
+            if (!sameRef(mainRef, offRef)) {
+                MapImageClientCache.zoomAt(offRef, zoomFactor, 0.5f, 0.5f);
+            }
+            return;
+        }
+
+        MapImageRef ref = mainRef != null ? mainRef : offRef;
+        EnumHand hand = mainRef != null ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
+        float[] local = MapImageProjection.local(hand, ref, mouseX, mouseY);
+        float s = local != null ? local[0] : 0.5f;
+        float t = local != null ? 1.0f - local[1] : 0.5f;
+        MapImageClientCache.zoomAt(ref, zoomFactor, s, t);
+    }
+
+    private static boolean sameRef(MapImageRef left, MapImageRef right) {
+        return left != null && right != null
+                && left.getMatch().equals(right.getMatch())
+                && left.getImage().equals(right.getImage());
     }
 }

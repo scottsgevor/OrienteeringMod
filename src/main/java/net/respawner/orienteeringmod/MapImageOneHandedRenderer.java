@@ -152,8 +152,8 @@ public final class MapImageOneHandedRenderer {
         GlStateManager.func_179109_b(64.0f, 64.0f, 0.0f);
         GlStateManager.func_179114_b((float)MapImageClientCache.rotation(ref), 0.0f, 0.0f, 1.0f);
         GlStateManager.func_179109_b(-64.0f, -64.0f, 0.0f);
-        if (MapInspectionController.isInspectionHand(hand)) {
-            MapImageProjection.update(ref, left, top, right, bottom, -0.01f);
+        if (MapInspectionController.isActive()) {
+            MapImageProjection.update(ref, left, top, right, bottom, -0.01f, hand);
         }
         buffer = tessellator.func_178180_c();
         buffer.func_181668_a(7, DefaultVertexFormats.field_181707_g);
