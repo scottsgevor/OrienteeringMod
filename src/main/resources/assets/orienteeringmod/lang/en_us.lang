@@ -11,3 +11,5 @@ key.categories.orienteeringmod=OrienteeringMod
 key.orienteeringmod.rotate_left=Rotate Map Left
 key.orienteeringmod.rotate_right=Rotate Map Right
 key.orienteeringmod.inspect=Inspect Held Map
+key.orienteeringmod.compass_position=Cycle Compass Position
+key.orienteeringmod.compass_toggle=Toggle Compass

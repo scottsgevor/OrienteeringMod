@@ -17,6 +17,7 @@ public final class MapImageClientSetup {
 
     public static void registerKeyBindings() {
         MapImageKeyBindings.register();
+        CompassKeyBindings.register();
     }
 
     @SubscribeEvent

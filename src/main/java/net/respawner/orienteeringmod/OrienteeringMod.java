@@ -66,11 +66,11 @@ import net.respawner.orienteeringmod.Track;
 import net.respawner.orienteeringmod.Util;
 import org.apache.logging.log4j.LogManager;
 
-@Mod(modid="orienteeringmod", name="Orienteering Mod", version="4.5", acceptedMinecraftVersions="[1.12.2]")
+@Mod(modid="orienteeringmod", name="Orienteering Mod", version="4.6", acceptedMinecraftVersions="[1.12.2]")
 public class OrienteeringMod {
     public static final String MODID = "orienteeringmod";
     public static final String NAME = "Orienteering Mod";
-    public static final String VERSION = "4.5";
+    public static final String VERSION = "4.6";
     public static final long SerialVersion = 4L;
     public static final int MatchseedVersion = 4;
     public static final SimpleNetworkWrapper NETHANDLER = NetworkRegistry.INSTANCE.newSimpleChannel("orienteeringmod");
@@ -183,8 +183,8 @@ public class OrienteeringMod {
             Minecraft mc = Minecraft.func_71410_x();
             GuiIngame gui = mc.field_71456_v;
             if (instance.decodeStatus() == ORTPlayer.PlayerStatus.InProgress) {
-                if (instance.needDrawCompass()) {
-                    Drawing.drawCompass(mc, gui);
+                if (instance.needDrawCompass() && CompassClientState.isVisible()) {
+                    Drawing.drawCompass(mc, gui, CompassClientState.positionIndex());
                 }
                 if (instance.displayTime()) {
                     Drawing.drawTimeString(mc, gui, startTime, timePenalty);

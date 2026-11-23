@@ -1,6 +1,6 @@
-# OrienteeringMod 4.5 使用说明
+# OrienteeringMod 4.6 使用说明
 
-> 本文档对应 OrienteeringMod 1.12.2 4.5。Word 版仅保留作旧格式参考；配置字段、命令和代码示例以本 Markdown 为准。
+> 本文档对应 OrienteeringMod 1.12.2 4.6。Word 版仅保留作旧格式参考；配置字段、命令和代码示例以本 Markdown 为准。
 
 ## 1. 文件管理
 
@@ -186,6 +186,10 @@
 ### 4.2 轨迹数据
 
 轨迹记录数据保存在客户端的 `config/orienteering` 目录，不属于比赛目录。轨迹输出的 `_track.png` 会写入 `.orienteering`。
+
+### 4.3 指北针
+
+比赛进行中且比赛开启 `drawcompass` 时显示。默认 `U` 循环位置：右上 → 左上 → 左下 → 右下；`I` 显示/隐藏。两项均可在“选项 → 控制 → 按键设置 → OrienteeringMod”中修改。位置和显隐状态保存在客户端 `config/orienteering-client.cfg`。
 
 ## 5. 命令
 
