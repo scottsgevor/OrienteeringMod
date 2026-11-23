@@ -60,7 +60,7 @@ extends CommandBase {
         if (!(sender instanceof EntityPlayerMP)) {
             if (args.length == 1) {
                 return CommandORT.complete(args, Arrays.asList("generate", "loadMatch", "openMatch",
-                        "closeMatch", "clearPlayers", "changeMode", "stat"));
+                        "closeMatch", "clearPlayers", "setCourse", "changeMode", "stat"));
             }
             if (args.length == 2) {
                 String sub = args[0].toLowerCase(Locale.ROOT);
@@ -70,13 +70,23 @@ extends CommandBase {
                 if ("generate".equals(sub)) {
                     return CommandORT.complete(args, matchNames("matchseed.json"));
                 }
+                if ("setcourse".equals(sub)) {
+                    return CommandORT.complete(args, onlinePlayerNames(server));
+                }
+            }
+            if (args.length == 3) {
+                String sub = args[0].toLowerCase(Locale.ROOT);
+                if ("setcourse".equals(sub) && ORTWorld.hasMatchServer()) {
+                    List<String> courses = new ArrayList<String>(ORTWorld.getMatchInstanceServer().match.getCourseList());
+                    return CommandORT.complete(args, courses);
+                }
             }
             return Collections.emptyList();
         }
         if (args.length == 1) {
             List<String> commands = new ArrayList<String>(Arrays.asList("generate", "loadMatch",
                     "openMatch", "closeMatch", "home", "clearPlayers", "getCourse", "changeCourse",
-                    "changeMode", "stat", "sketch", "stuck", "back"));
+                    "setCourse", "changeMode", "stat", "sketch", "stuck", "back"));
             return CommandORT.complete(args, commands);
         }
         if (args.length == 2) {
@@ -91,8 +101,82 @@ extends CommandBase {
                 List<String> courses = new ArrayList<String>(ORTWorld.getMatchInstanceServer().match.getCourseList());
                 return CommandORT.complete(args, courses);
             }
+            if ("setcourse".equals(sub)) {
+                return CommandORT.complete(args, onlinePlayerNames(server));
+            }
+        }
+        if (args.length == 3) {
+            String sub = args[0].toLowerCase(Locale.ROOT);
+            if ("setcourse".equals(sub) && ORTWorld.hasMatchServer()) {
+                List<String> courses = new ArrayList<String>(ORTWorld.getMatchInstanceServer().match.getCourseList());
+                return CommandORT.complete(args, courses);
+            }
         }
         return Collections.emptyList();
+    }
+
+    private static EntityPlayerMP findOnlinePlayer(MinecraftServer server, String name) {
+        if (server == null || name == null) {
+            return null;
+        }
+        for (EntityPlayerMP player : server.func_184103_al().func_181057_v()) {
+            if (player.func_70005_c_().equalsIgnoreCase(name)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
+    private static List<String> onlinePlayerNames(MinecraftServer server) {
+        List<String> names = new ArrayList<String>();
+        if (server != null) {
+            for (EntityPlayerMP player : server.func_184103_al().func_181057_v()) {
+                names.add(player.func_70005_c_());
+            }
+        }
+        return names;
+    }
+
+    private static void changePlayerCourse(ICommandSender sender, MinecraftServer server,
+                                           String actorName, String targetName, String courseName) {
+        try {
+            if (!ORTWorld.hasMatchServer()) {
+                Util.sendMessage(sender, "The current world does not have a match.");
+                return;
+            }
+            ORTWorld instance = ORTWorld.getMatchInstanceServer();
+            EntityPlayerMP target = findOnlinePlayer(server, targetName);
+            if (target == null) {
+                Util.sendMessage(sender, "Player not found or not online.");
+                return;
+            }
+            ORTPlayer targetPlayer = instance.getPlayerByName(target.func_70005_c_());
+            if (targetPlayer == null) {
+                Util.sendMessage(sender, "Action failed. That player is not registered in the player roster.");
+                return;
+            }
+            boolean inProgress = targetPlayer.isInMatchProgress();
+            instance.match.changeCourseAsAdmin(target.func_70005_c_(), courseName);
+            try {
+                MapImageService.giveMaps(target, instance.matchName, courseName);
+            }
+            catch (Throwable e) {
+                LogManager.getLogger().warn("Failed to give map images to " + target.func_70005_c_() + ": " + e.getMessage());
+            }
+            Util.sendMessage(target, "Your course has been changed to " + courseName + " by " + actorName + ".");
+            if (inProgress && target != sender) {
+                Util.sendMessage(target, "Your current match was not reset; existing progress may no longer match the new course.");
+            }
+            Util.sendMessage(sender, "Changed course of " + target.func_70005_c_() + " to " + courseName + "."
+                    + (inProgress ? " (target was in progress; current run was not reset)." : ""));
+        }
+        catch (ORTIngameException e) {
+            Util.sendMessage(sender, e.getMessage());
+        }
+        catch (Throwable e) {
+            LogManager.getLogger().error(e.toString());
+            Util.sendMessage(sender, "Error: action Failed. Unknown Reason.");
+        }
     }
 
     private static List<String> complete(String[] args, List<String> candidates) {
@@ -219,6 +303,18 @@ extends CommandBase {
                 LogManager.getLogger().error(e.toString());
                 Util.sendMessage(sender, Util.MSG_ACTION_FAILED);
             }
+            return;
+        }
+        if ("setCourse".equals(args[0])) {
+            if (!(sender instanceof MinecraftServer)) {
+                Util.sendMessage(sender, "Only the server console can use this command.");
+                return;
+            }
+            if (args.length < 3) {
+                Util.sendMessage(sender, "Usage: /ORT setCourse <player> <course>");
+                return;
+            }
+            changePlayerCourse(sender, server, "server console", args[1], args[2]);
             return;
         }
         if ("changeMode".equals(args[0])) {
@@ -465,6 +561,23 @@ extends CommandBase {
                 LogManager.getLogger().error(e.toString());
                 Util.sendMessage(player, "Error: action Failed. Unknown Reason.");
             }
+            return;
+        }
+        if (args[0].equals("setCourse")) {
+            if (!ORTWorld.hasMatchServer()) {
+                Util.sendMessage(player, "The current world does not have a match.");
+                return;
+            }
+            if (args.length < 3) {
+                Util.sendMessage(player, "Usage: /ORT setCourse <player> <course>");
+                return;
+            }
+            ORTWorld instance = ORTWorld.getMatchInstanceServer();
+            if (!instance.match.isAdmin(player.func_70005_c_())) {
+                Util.sendMessage(player, "Only admin can change another player's course.");
+                return;
+            }
+            changePlayerCourse(player, player.field_71133_b, player.func_70005_c_(), args[1], args[2]);
             return;
         }
         if (args[0].equals("changeMode")) {
