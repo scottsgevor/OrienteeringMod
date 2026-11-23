@@ -136,7 +136,7 @@ public final class MapImageTwoHandedRenderer {
         float[] window = MapImageClientCache.window(ref);
         GlStateManager.func_179094_E();
         GlStateManager.func_179109_b(64.0f, 64.0f, 0.0f);
-        GlStateManager.func_179114_b((float) (-MapImageClientCache.rotation(ref)), 0.0f, 0.0f, 1.0f);
+        GlStateManager.func_179114_b((float) MapImageClientCache.rotation(ref), 0.0f, 0.0f, 1.0f);
         GlStateManager.func_179109_b(-64.0f, -64.0f, 0.0f);
         MapImageProjection.update(ref, left, top, right, bottom, -0.01f);
         buffer = tessellator.func_178180_c();
