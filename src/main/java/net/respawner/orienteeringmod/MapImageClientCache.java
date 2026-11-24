@@ -217,6 +217,18 @@ public final class MapImageClientCache {
         }
     }
 
+    public static void panBy(MapImageRef ref, float du, float dv) {
+        if (ref == null) {
+            return;
+        }
+        synchronized (ENTRIES) {
+            Entry entry = getOrCreate(ref);
+            float half = 0.5f / entry.zoom;
+            entry.centerU = Math.max(half, Math.min(1.0f - half, entry.centerU - du / entry.zoom));
+            entry.centerV = Math.max(half, Math.min(1.0f - half, entry.centerV - dv / entry.zoom));
+        }
+    }
+
     private static void markFailed(Entry entry) {
         entry.failed = true;
         entry.requested = false;

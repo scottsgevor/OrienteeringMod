@@ -38,7 +38,8 @@ public final class MapImageOverlayRenderer {
     private static void drawHelp(Minecraft mc, int screenWidth) {
         String help = MapImageKeyBindings.display(MapImageKeyBindings.ROTATE_LEFT) + ": rotate left   "
                 + MapImageKeyBindings.display(MapImageKeyBindings.ROTATE_RIGHT) + ": rotate right   "
-                + "Scroll: zoom held map   "
+                + "Scroll: zoom map   "
+                + "LMB drag: pan map   "
                 + MapImageKeyBindings.display(MapImageKeyBindings.INSPECT) + ": restore cursor";
         String zoom = "Zoom: " + Math.round(MapInspectionController.getZoom() * 100.0f) + "%";
         int textWidth = mc.field_71466_p.func_78256_a(help);

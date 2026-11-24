@@ -2,6 +2,7 @@ package net.respawner.orienteeringmod;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
@@ -51,6 +52,11 @@ public final class MapImageInputHandler {
             MapInspectionController.scroll(mc, wheel);
         }
         event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public static void onRenderWorldLast(RenderWorldLastEvent event) {
+        MapInspectionController.updateDrag(Minecraft.func_71410_x());
     }
 
     @SubscribeEvent

@@ -43,9 +43,11 @@ public final class MapImageProjection {
                 & project(snapshot, right, bottom, z, 2) & project(snapshot, left, bottom, z, 3)) {
             snapshot.ref = imageRef;
             snapshot.valid = true;
+            snapshot.homographyValid = computeHomography(snapshot);
         }
         else {
             snapshot.valid = false;
+            snapshot.homographyValid = false;
         }
     }
 
@@ -75,6 +77,21 @@ public final class MapImageProjection {
         return null;
     }
 
+    public static float[] rawLocal(EnumHand hand, MapImageRef wanted, float mouseX, float mouseY) {
+        Snapshot snapshot = snapshot(hand);
+        if (!matches(snapshot, wanted) || !MapInspectionController.isActive() || !snapshot.homographyValid) {
+            return null;
+        }
+        double[] inverse = snapshot.inverseHomography;
+        double x = inverse[0] * mouseX + inverse[1] * mouseY + inverse[2];
+        double y = inverse[3] * mouseX + inverse[4] * mouseY + inverse[5];
+        double w = inverse[6] * mouseX + inverse[7] * mouseY + inverse[8];
+        if (Math.abs(w) < 0.000001) {
+            return null;
+        }
+        return new float[] { (float) (x / w), (float) (y / w) };
+    }
+
     public static float centerDistanceSq(EnumHand hand, MapImageRef wanted, float mouseX, float mouseY) {
         Snapshot snapshot = snapshot(hand);
         if (!matches(snapshot, wanted) || !MapInspectionController.isActive()) {
@@ -90,6 +107,54 @@ public final class MapImageProjection {
     public static void clear() {
         MAIN.clear();
         OFF.clear();
+    }
+
+    private static boolean computeHomography(Snapshot snapshot) {
+        double x0 = snapshot.x[0];
+        double y0 = snapshot.y[0];
+        double x1 = snapshot.x[1];
+        double y1 = snapshot.y[1];
+        double x2 = snapshot.x[2];
+        double y2 = snapshot.y[2];
+        double x3 = snapshot.x[3];
+        double y3 = snapshot.y[3];
+        double dx1 = x1 - x2;
+        double dx2 = x3 - x2;
+        double sx = x0 - x1 + x2 - x3;
+        double dy1 = y1 - y2;
+        double dy2 = y3 - y2;
+        double sy = y0 - y1 + y2 - y3;
+        double den = dx1 * dy2 - dx2 * dy1;
+        double g = 0.0D;
+        double h = 0.0D;
+        if (Math.abs(den) > 0.000000001D) {
+            g = (sx * dy2 - dx2 * sy) / den;
+            h = (dx1 * sy - sx * dy1) / den;
+        }
+        else if (Math.abs(sx) > 0.000001D || Math.abs(sy) > 0.000001D) {
+            return false;
+        }
+        double a = x1 - x0 + g * x1;
+        double b = x3 - x0 + h * x3;
+        double c = x0;
+        double d = y1 - y0 + g * y1;
+        double e = y3 - y0 + h * y3;
+        double f = y0;
+        double det = a * (e - f * h) - b * (d - f * g) + c * (d * h - e * g);
+        if (Math.abs(det) < 0.000000001D) {
+            return false;
+        }
+        double[] inverse = snapshot.inverseHomography;
+        inverse[0] = (e - f * h) / det;
+        inverse[1] = (c * h - b) / det;
+        inverse[2] = (b * f - c * e) / det;
+        inverse[3] = (f * g - d) / det;
+        inverse[4] = (a - c * g) / det;
+        inverse[5] = (c * d - a * f) / det;
+        inverse[6] = (d * h - e * g) / det;
+        inverse[7] = (b * g - a * h) / det;
+        inverse[8] = (a * e - b * d) / det;
+        return true;
     }
 
     private static Snapshot snapshot(EnumHand hand) {
@@ -144,12 +209,15 @@ public final class MapImageProjection {
     private static final class Snapshot {
         final float[] x = new float[4];
         final float[] y = new float[4];
+        final double[] inverseHomography = new double[9];
         MapImageRef ref;
         boolean valid;
+        boolean homographyValid;
 
         void clear() {
             ref = null;
             valid = false;
+            homographyValid = false;
         }
     }
 }
