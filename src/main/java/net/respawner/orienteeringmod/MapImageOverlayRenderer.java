@@ -1,9 +1,11 @@
 package net.respawner.orienteeringmod;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.EnumHand;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -38,13 +40,38 @@ public final class MapImageOverlayRenderer {
     private static void drawHelp(Minecraft mc, int screenWidth) {
         String help = MapImageKeyBindings.display(MapImageKeyBindings.ROTATE_LEFT) + ": rotate left   "
                 + MapImageKeyBindings.display(MapImageKeyBindings.ROTATE_RIGHT) + ": rotate right   "
-                + "Scroll: zoom held map   "
+                + "Scroll: zoom map   "
+                + "LMB drag: pan map   "
                 + MapImageKeyBindings.display(MapImageKeyBindings.INSPECT) + ": restore cursor";
-        String zoom = "Zoom: " + Math.round(MapInspectionController.getZoom() * 100.0f) + "%";
+        String zoom = zoomText(mc);
         int textWidth = mc.field_71466_p.func_78256_a(help);
         int x = Math.max(4, (screenWidth - textWidth) / 2);
         Gui.func_73734_a(x - 4, 6, x + textWidth + 4, 32, 0x80000000);
         mc.field_71466_p.func_78276_b(help, x, 9, 0xFFFFFF);
         mc.field_71466_p.func_78276_b(zoom, x, 21, 0xA0A0A0);
+    }
+
+    private static String zoomText(Minecraft mc) {
+        EntityPlayerSP player = mc.field_71439_g;
+        if (player == null) {
+            return "Zoom: --";
+        }
+        MapImageRef main = MapImageRef.fromStack(player.func_184586_b(EnumHand.MAIN_HAND));
+        MapImageRef off = MapImageRef.fromStack(player.func_184586_b(EnumHand.OFF_HAND));
+        if (main != null && off != null) {
+            int mainZoom = Math.round(MapImageClientCache.zoom(main) * 100.0f);
+            if (main.getMatch().equals(off.getMatch()) && main.getImage().equals(off.getImage())) {
+                return "Zoom: " + mainZoom + "%";
+            }
+            int offZoom = Math.round(MapImageClientCache.zoom(off) * 100.0f);
+            return "Zoom: " + mainZoom + "% main / " + offZoom + "% off";
+        }
+        if (main != null) {
+            return "Zoom: " + Math.round(MapImageClientCache.zoom(main) * 100.0f) + "%";
+        }
+        if (off != null) {
+            return "Zoom: " + Math.round(MapImageClientCache.zoom(off) * 100.0f) + "%";
+        }
+        return "Zoom: --";
     }
 }
