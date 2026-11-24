@@ -30,10 +30,6 @@ public final class MapInspectionController {
         return ref;
     }
 
-    public static float getZoom() {
-        return ref == null ? MapImageClientCache.MIN_ZOOM : MapImageClientCache.zoom(ref);
-    }
-
     public static void toggle(Minecraft mc) {
         if (mc == null || mc.field_71439_g == null) {
             return;
