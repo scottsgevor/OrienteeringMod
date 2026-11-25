@@ -137,16 +137,6 @@ public final class MapImageClientCache {
         return entry == null ? null : entry.texture;
     }
 
-    public static int width(MapImageRef ref) {
-        Entry entry = get(ref);
-        return entry == null ? 0 : entry.width;
-    }
-
-    public static int height(MapImageRef ref) {
-        Entry entry = get(ref);
-        return entry == null ? 0 : entry.height;
-    }
-
     public static boolean failed(MapImageRef ref) {
         Entry entry = get(ref);
         return entry != null && entry.failed;
@@ -178,40 +168,59 @@ public final class MapImageClientCache {
         return entry == null ? MIN_ZOOM : entry.zoom;
     }
 
+    public static float[] displayQuad(MapImageRef ref, float longSide) {
+        if (ref == null) {
+            return new float[] { longSide, longSide };
+        }
+        synchronized (ENTRIES) {
+            Entry entry = getOrCreate(ref);
+            return quad(entry, longSide, entry.zoom);
+        }
+    }
+
     public static float[] window(MapImageRef ref) {
         if (ref == null) {
             return new float[] { 0.0f, 0.0f, 1.0f, 1.0f };
         }
         synchronized (ENTRIES) {
             Entry entry = getOrCreate(ref);
-            float half = 0.5f / entry.zoom;
-            float centerU = Math.max(half, Math.min(1.0f - half, entry.centerU));
-            float centerV = Math.max(half, Math.min(1.0f - half, entry.centerV));
-            return new float[] { centerU - half, centerV - half, centerU + half, centerV + half };
+            float uHalf = halfU(entry, entry.zoom);
+            float vHalf = halfV(entry, entry.zoom);
+            float centerU = Math.max(uHalf, Math.min(1.0f - uHalf, entry.centerU));
+            float centerV = Math.max(vHalf, Math.min(1.0f - vHalf, entry.centerV));
+            return new float[] { centerU - uHalf, centerV - vHalf, centerU + uHalf, centerV + vHalf };
         }
     }
 
-    public static float zoomAt(MapImageRef ref, float factor, float s, float t) {
+    public static float zoomAt(MapImageRef ref, float factor, float s, float tDown) {
         if (ref == null) {
             return MIN_ZOOM;
         }
         synchronized (ENTRIES) {
             Entry entry = getOrCreate(ref);
             float oldZoom = entry.zoom;
-            float oldHalf = 0.5f / oldZoom;
-            float oldCenterU = Math.max(oldHalf, Math.min(1.0f - oldHalf, entry.centerU));
-            float oldCenterV = Math.max(oldHalf, Math.min(1.0f - oldHalf, entry.centerV));
-            float imageU = oldCenterU - oldHalf + s * oldHalf * 2.0f;
-            float imageV = oldCenterV - oldHalf + t * oldHalf * 2.0f;
-            float newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, oldZoom * factor));
+            float oldHalfU = halfU(entry, oldZoom);
+            float oldHalfV = halfV(entry, oldZoom);
+            float oldCenterU = Math.max(oldHalfU, Math.min(1.0f - oldHalfU, entry.centerU));
+            float oldCenterV = Math.max(oldHalfV, Math.min(1.0f - oldHalfV, entry.centerV));
+            float tUp = 1.0f - tDown;
+            float imageU = oldCenterU - oldHalfU + s * oldHalfU * 2.0f;
+            float imageV = oldCenterV - oldHalfV + tUp * oldHalfV * 2.0f;
+            float newZoom = Math.max(MIN_ZOOM, Math.min(maxZoom(entry), oldZoom * factor));
             if (Math.abs(newZoom - oldZoom) < 0.0001f) {
                 return oldZoom;
             }
-            float newHalf = 0.5f / newZoom;
-            entry.centerU = Math.max(newHalf, Math.min(1.0f - newHalf,
-                    imageU + (0.5f - s) * newHalf * 2.0f));
-            entry.centerV = Math.max(newHalf, Math.min(1.0f - newHalf,
-                    imageV + (0.5f - t) * newHalf * 2.0f));
+            float newHalfU = halfU(entry, newZoom);
+            float newHalfV = halfV(entry, newZoom);
+            float[] oldQuad = quad(entry, 1.0f, oldZoom);
+            float[] newQuad = quad(entry, 1.0f, newZoom);
+            float s1 = 0.5f + (s - 0.5f) * oldQuad[0] / newQuad[0];
+            float t1 = 0.5f + (tDown - 0.5f) * oldQuad[1] / newQuad[1];
+            float t1Up = 1.0f - t1;
+            entry.centerU = Math.max(newHalfU, Math.min(1.0f - newHalfU,
+                    imageU - s1 * newHalfU * 2.0f + newHalfU));
+            entry.centerV = Math.max(newHalfV, Math.min(1.0f - newHalfV,
+                    imageV - t1Up * newHalfV * 2.0f + newHalfV));
             entry.zoom = newZoom;
             return newZoom;
         }
@@ -223,10 +232,46 @@ public final class MapImageClientCache {
         }
         synchronized (ENTRIES) {
             Entry entry = getOrCreate(ref);
-            float half = 0.5f / entry.zoom;
-            entry.centerU = Math.max(half, Math.min(1.0f - half, entry.centerU - du / entry.zoom));
-            entry.centerV = Math.max(half, Math.min(1.0f - half, entry.centerV - dv / entry.zoom));
+            float uHalf = halfU(entry, entry.zoom);
+            float vHalf = halfV(entry, entry.zoom);
+            entry.centerU = Math.max(uHalf, Math.min(1.0f - uHalf,
+                    entry.centerU - du * uHalf * 2.0f));
+            entry.centerV = Math.max(vHalf, Math.min(1.0f - vHalf,
+                    entry.centerV - dv * vHalf * 2.0f));
         }
+    }
+
+    private static float fillZoom(Entry entry) {
+        if (entry.width <= 0 || entry.height <= 0) {
+            return 1.0f;
+        }
+        return (float) Math.max(entry.width, entry.height) / (float) Math.min(entry.width, entry.height);
+    }
+
+    private static float maxZoom(Entry entry) {
+        return Math.max(MAX_ZOOM, Math.min(fillZoom(entry), 32.0f));
+    }
+
+    private static float halfU(Entry entry, float zoom) {
+        if (entry.width > 0 && entry.height > 0 && entry.width < entry.height) {
+            return 0.5f * Math.min(1.0f, fillZoom(entry) / zoom);
+        }
+        return 0.5f / zoom;
+    }
+
+    private static float halfV(Entry entry, float zoom) {
+        if (entry.width > 0 && entry.height > 0 && entry.width < entry.height) {
+            return 0.5f / zoom;
+        }
+        return 0.5f * Math.min(1.0f, fillZoom(entry) / zoom);
+    }
+
+    private static float[] quad(Entry entry, float longSide, float zoom) {
+        float shortSide = longSide * Math.min(1.0f, zoom / fillZoom(entry));
+        if (entry.width > 0 && entry.height > 0 && entry.width < entry.height) {
+            return new float[] { shortSide, longSide };
+        }
+        return new float[] { longSide, shortSide };
     }
 
     private static void markFailed(Entry entry) {

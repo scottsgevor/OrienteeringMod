@@ -32,17 +32,9 @@ public class MapImageItemRenderer extends TileEntityItemStackRenderer {
         if (texture == null) {
             texture = PLACEHOLDER;
         }
-        int imageWidth = MapImageClientCache.width(ref);
-        int imageHeight = MapImageClientCache.height(ref);
-        float width = 1.0f;
-        float height = 1.0f;
-        if (imageWidth > 0 && imageHeight > 0) {
-            if (imageWidth >= imageHeight) {
-                height = (float) imageHeight / (float) imageWidth;
-            } else {
-                width = (float) imageWidth / (float) imageHeight;
-            }
-        }
+        float[] quad = MapImageClientCache.displayQuad(ref, 1.0f);
+        float width = quad[0];
+        float height = quad[1];
         int rotation = MapImageClientCache.rotation(ref);
         if (rotation % 180 != 0) {
             float swap = width;

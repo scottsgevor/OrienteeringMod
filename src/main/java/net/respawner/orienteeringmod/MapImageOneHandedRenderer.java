@@ -104,18 +104,9 @@ public final class MapImageOneHandedRenderer {
         if (texture == null) {
             texture = PLACEHOLDER;
         }
-        int imageWidth = MapImageClientCache.width(ref);
-        int imageHeight = MapImageClientCache.height(ref);
-        float width = 128.0f;
-        float height = 128.0f;
-        if (imageWidth > 0 && imageHeight > 0) {
-            if (imageWidth >= imageHeight) {
-                height = 128.0f * (float)imageHeight / (float)imageWidth;
-            }
-            else {
-                width = 128.0f * (float)imageWidth / (float)imageHeight;
-            }
-        }
+        float[] quad = MapImageClientCache.displayQuad(ref, 128.0f);
+        float width = quad[0];
+        float height = quad[1];
         float left = 64.0f - width / 2.0f;
         float right = 64.0f + width / 2.0f;
         float bottom = 64.0f - height / 2.0f;

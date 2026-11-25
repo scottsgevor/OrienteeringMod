@@ -227,6 +227,9 @@ public final class MapInspectionController {
         if (!active || wheel == 0 || mc == null || mc.field_71439_g == null) {
             return;
         }
+        if (dragging) {
+            clearDrag();
+        }
         EntityPlayerSP player = mc.field_71439_g;
         MapImageRef mainRef = MapImageRef.fromStack(player.func_184586_b(EnumHand.MAIN_HAND));
         MapImageRef offRef = MapImageRef.fromStack(player.func_184586_b(EnumHand.OFF_HAND));
@@ -239,8 +242,8 @@ public final class MapInspectionController {
         float zoomFactor = (float) factor;
 
         if (mainRef != null && offRef != null) {
-            float[] mainLocal = MapImageProjection.local(EnumHand.MAIN_HAND, mainRef, mouseX, mouseY);
-            float[] offLocal = MapImageProjection.local(EnumHand.OFF_HAND, offRef, mouseX, mouseY);
+            float[] mainLocal = MapImageProjection.localClamped(EnumHand.MAIN_HAND, mainRef, mouseX, mouseY);
+            float[] offLocal = MapImageProjection.localClamped(EnumHand.OFF_HAND, offRef, mouseX, mouseY);
             if (mainLocal != null || offLocal != null) {
                 if (mainLocal != null && offLocal != null) {
                     float mainDistance = MapImageProjection.centerDistanceSq(
@@ -248,17 +251,17 @@ public final class MapInspectionController {
                     float offDistance = MapImageProjection.centerDistanceSq(
                             EnumHand.OFF_HAND, offRef, mouseX, mouseY);
                     if (offDistance < mainDistance) {
-                        MapImageClientCache.zoomAt(offRef, zoomFactor, offLocal[0], 1.0f - offLocal[1]);
+                        MapImageClientCache.zoomAt(offRef, zoomFactor, offLocal[0], offLocal[1]);
                     }
                     else {
-                        MapImageClientCache.zoomAt(mainRef, zoomFactor, mainLocal[0], 1.0f - mainLocal[1]);
+                        MapImageClientCache.zoomAt(mainRef, zoomFactor, mainLocal[0], mainLocal[1]);
                     }
                 }
                 else if (mainLocal != null) {
-                    MapImageClientCache.zoomAt(mainRef, zoomFactor, mainLocal[0], 1.0f - mainLocal[1]);
+                    MapImageClientCache.zoomAt(mainRef, zoomFactor, mainLocal[0], mainLocal[1]);
                 }
                 else {
-                    MapImageClientCache.zoomAt(offRef, zoomFactor, offLocal[0], 1.0f - offLocal[1]);
+                    MapImageClientCache.zoomAt(offRef, zoomFactor, offLocal[0], offLocal[1]);
                 }
                 return;
             }
@@ -271,9 +274,9 @@ public final class MapInspectionController {
 
         MapImageRef ref = mainRef != null ? mainRef : offRef;
         EnumHand hand = mainRef != null ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND;
-        float[] local = MapImageProjection.local(hand, ref, mouseX, mouseY);
+        float[] local = MapImageProjection.localClamped(hand, ref, mouseX, mouseY);
         float s = local != null ? local[0] : 0.5f;
-        float t = local != null ? 1.0f - local[1] : 0.5f;
+        float t = local != null ? local[1] : 0.5f;
         MapImageClientCache.zoomAt(ref, zoomFactor, s, t);
     }
 
