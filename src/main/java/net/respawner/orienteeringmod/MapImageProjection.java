@@ -51,30 +51,16 @@ public final class MapImageProjection {
         }
     }
 
-    public static float[] local(EnumHand hand, MapImageRef wanted, float mouseX, float mouseY) {
-        Snapshot snapshot = snapshot(hand);
-        if (!matches(snapshot, wanted) || !MapInspectionController.isActive()) {
+    public static float[] localClamped(EnumHand hand, MapImageRef wanted, float mouseX, float mouseY) {
+        float[] local = rawLocal(hand, wanted, mouseX, mouseY);
+        if (local == null || local[0] < -0.001f || local[0] > 1.001f
+                || local[1] < -0.001f || local[1] > 1.001f) {
             return null;
         }
-        float[] first = triangle(snapshot, mouseX, mouseY, 0, 1, 2);
-        if (first != null) {
-            float w0 = first[0];
-            float w1 = first[1];
-            float w2 = first[2];
-            float base = w0 + w1;
-            float s = base > 0.00001f ? w1 / base : 0.5f;
-            return new float[] { clamp01(s), clamp01(w2) };
-        }
-        float[] second = triangle(snapshot, mouseX, mouseY, 0, 2, 3);
-        if (second != null) {
-            float w0 = second[0];
-            float w2 = second[1];
-            float w3 = second[2];
-            float base = w2 + w3;
-            float s = base > 0.00001f ? w2 / base : 0.5f;
-            return new float[] { clamp01(s), clamp01(w2 + w3) };
-        }
-        return null;
+        return new float[] {
+                Math.max(0.0f, Math.min(1.0f, local[0])),
+                Math.max(0.0f, Math.min(1.0f, local[1]))
+        };
     }
 
     public static float[] rawLocal(EnumHand hand, MapImageRef wanted, float mouseX, float mouseY) {
@@ -180,30 +166,6 @@ public final class MapImageProjection {
         snapshot.x[index] = PROJECTED.get(0);
         snapshot.y[index] = PROJECTED.get(1);
         return true;
-    }
-
-    private static float[] triangle(Snapshot snapshot, float px, float py, int a, int b, int c) {
-        float ax = snapshot.x[a];
-        float ay = snapshot.y[a];
-        float bx = snapshot.x[b];
-        float by = snapshot.y[b];
-        float cx = snapshot.x[c];
-        float cy = snapshot.y[c];
-        float det = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy);
-        if (Math.abs(det) < 0.00001f) {
-            return null;
-        }
-        float w0 = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / det;
-        float w1 = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / det;
-        float w2 = 1.0f - w0 - w1;
-        if (w0 < -0.001f || w1 < -0.001f || w2 < -0.001f) {
-            return null;
-        }
-        return new float[] { w0, w1, w2 };
-    }
-
-    private static float clamp01(float value) {
-        return Math.max(0.0f, Math.min(1.0f, value));
     }
 
     private static final class Snapshot {
